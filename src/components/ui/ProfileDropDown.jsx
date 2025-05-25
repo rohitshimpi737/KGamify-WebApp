@@ -1,30 +1,32 @@
 import { useState } from "react";
-const ProfileDropDown = () => {
+import DefaultImage from "../../assets/image.png";
+
+const ProfileDropDown = ({ darkMode }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   
   return (
     <>
-      <div className="flex items-center">
-        <div className="relative">
+      <div className="flex items-center border-0">
+        <div className="relative ">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+            className={`flex text-sm rounded-full focus:ring-4 ${darkMode ? 'bg-gray-800 focus:ring-gray-600' : 'bg-gray-800 focus:ring-gray-300'}`}
           >
-            <span className="sr-only">Open user menu</span>
+            <span className="sr-only cursor-pointer">Open user menu</span>
             <img
-              className="w-8 h-8 rounded-full"
-              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+              className="w-8 h-8 rounded-full cursor-pointer"
+              src={DefaultImage}
               alt="user"
             />
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 z-50 my-4 text-base bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600">
-              <div className="px-4 py-3">
-                <p className="text-sm text-gray-900 dark:text-white">
+            <div className={`absolute right-0 z-50 my-4 text-base divide-y rounded-sm shadow-sm ${darkMode ? 'bg-gray-700 divide-gray-600' : 'bg-white divide-gray-100'}`}>
+              <div className={`px-4 py-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <p className={`text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   anish
                 </p>
-                <p className="text-sm font-medium text-gray-900 truncate dark:text-gray-300">
+                <p className={`text-sm font-medium truncate ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                   anish@example.com
                 </p>
               </div>
@@ -32,23 +34,7 @@ const ProfileDropDown = () => {
                 <li>
                   <a
                     href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600"
-                  >
-                    Profile
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600"
-                  >
-                    Settings
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600"
+                    className={`block px-4 py-2 text-sm rounded ${darkMode ? 'text-gray-300 hover:bg-gray-600' : 'text-gray-700 hover:bg-gray-100'}`}
                   >
                     Sign out
                   </a>
@@ -61,6 +47,5 @@ const ProfileDropDown = () => {
     </>
   );
 }
-
 
 export default ProfileDropDown;

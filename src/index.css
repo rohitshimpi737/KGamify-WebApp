@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+    @apply dark:bg-black dark:text-white;
+    @apply transition-colors duration-200;
+  }
+}
