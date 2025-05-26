@@ -2,19 +2,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { ThemeProvider } from './contexts/ThemeContext'; // Add this import
+import { ThemeProvider } from './contexts/ThemeContext';
 import App from './App';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
 import Challenges from './pages/Challenges';
 import Profile from './components/ui/Profile';
 import Settings from './components/ui/Settings';
+import AuthForm from './components/SignUp/SignUp';
 import NavigationGuard from './components/layout/NavigationGuard';
 import './index.css';
 
 const router = createBrowserRouter([
   {
     path: '/',
+    element: <AuthForm />,
+  },
+  {
+    path: '/app',
     element: (
       <NavigationGuard>
         <App />
@@ -26,13 +31,22 @@ const router = createBrowserRouter([
       { path: 'settings', element: <Settings /> },
       { path: 'challenges', element: <Challenges /> },
       { path: 'profile', element: <Profile /> },
-    ]
-  }
+      // { path: 'analytics', element: <Analytics /> }, // Add this line
+
+    ],
+  },
+  {
+    path: '/logout',
+    element: <AuthForm />,
+  },
+
+  { path: '*', element: <NotFound /> }
+
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ThemeProvider> 
+    <ThemeProvider>
       <RouterProvider router={router} />
     </ThemeProvider>
   </React.StrictMode>

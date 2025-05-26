@@ -230,7 +230,7 @@ const Profile = () => {
                 onChange={(e) =>
                   setUserDetails({ ...userDetails, country: e.target.value })
                 }
-                className="w-full p-2 border text-zinc-600  rounded-md border-zinc-500  outline-none cursor-pointer dark:bg-zinc-800 dark:text-white dark:border-zinc-600"
+                className="w-full p-2 border text-zinc-600  rounded-md border-zinc-500  outline-none cursor-pointer "
               >
                 <option value="">Select Country</option>
                 {countries.map((country) => (
@@ -251,7 +251,7 @@ const Profile = () => {
                 onChange={(e) =>
                   setUserDetails({ ...userDetails, state: e.target.value })
                 }
-                className="w-full p-2 text-zinc-600  border border-zinc-500 rounded-md outline-none cursor-pointer dark:bg-zinc-800 dark:text-white dark:border-zinc-600"
+                className="w-full p-2 text-zinc-600  border border-zinc-500 rounded-md outline-none cursor-pointer "
                 disabled={!userDetails.country}
               >
                 <option className="" value="">
@@ -275,7 +275,7 @@ const Profile = () => {
                 onChange={(e) =>
                   setUserDetails({ ...userDetails, city: e.target.value })
                 }
-                className="w-full p-2 border text-zinc-600  border-zinc-500 rounded-md  outline-none cursor-pointer dark:bg-zinc-800 dark:text-white dark:border-zinc-600"
+                className="w-full p-2 border text-zinc-600  border-zinc-500 rounded-md  outline-none cursor-pointer "
                 disabled={!userDetails.state}
               >
                 <option value="">Select City</option>

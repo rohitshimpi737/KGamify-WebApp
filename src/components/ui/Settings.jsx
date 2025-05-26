@@ -13,11 +13,11 @@ const Settings = () => {
 
   return (
     <div className="ml-0 p-6 max-w-md mx-auto space-y-8 min-h-screen">
-      <h1 className={`text-2xl font-bold mb-8 ${darkMode ? 'text-orange-400':''}` }>Settings</h1>
+      <h1 className={`text-2xl font-bold mb-8 ${darkMode ? 'text-orange-400':'text-black'}` }>Settings</h1>
 
       <div className="space-y-4">
         {/* Dark Theme Toggle */}
-        <div className={`flex items-center justify-between p-4 rounded-lg  ${darkMode ? 'bg-gray-700 hover:bg-[#f58220]  text-white ':'bg-gray-100 hover:bg-orange-200'}`}>
+        <div className={`flex items-center justify-between p-4 rounded-lg  ${darkMode ? 'bg-gray-700 hover:bg-[#f58220]  text-white ':'bg-gray-100 text-black hover:bg-orange-200'}`}>
           <div>
             <h2 className="font-semibold">Dark Theme</h2>
             <p className="text-sm text-gray-600  ">
@@ -39,7 +39,7 @@ const Settings = () => {
         </div>
 
         {/* License Section */}
-        <div className={`p-4 rounded-lg h ${darkMode ? 'bg-gray-700 hover:bg-[#f58220]  text-white ':'bg-gray-100 hover:bg-orange-200'}`}>
+        <div className={`p-4 rounded-lg h ${darkMode ? 'bg-gray-700 hover:bg-[#f58220]  text-white ':'bg-gray-100 text-black hover:bg-orange-200'}`}>
           <h2 className="font-semibold mb-2">License</h2>
           <div className="relative">
             <pre className={`p-3 rounded-md text-sm ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
