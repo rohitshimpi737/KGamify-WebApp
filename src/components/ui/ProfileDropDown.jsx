@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DefaultImage from "../../assets/image.png";
+import {Link} from 'react-router-dom'
 
 const ProfileDropDown = ({ darkMode }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -32,12 +33,12 @@ const ProfileDropDown = ({ darkMode }) => {
               </div>
               <ul className="py-1">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/logout"
                     className={`block px-4 py-2 text-sm rounded ${darkMode ? 'text-gray-300 hover:bg-gray-600' : 'text-gray-700 hover:bg-gray-100'}`}
                   >
                     Sign out
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

@@ -6,7 +6,6 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import App from './App';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
-import Challenges from './pages/Challenges';
 import Profile from './components/ui/Profile';
 import Settings from './components/ui/Settings';
 import AuthForm from './components/SignUp/SignUp';
@@ -29,7 +28,6 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: 'settings', element: <Settings /> },
-      { path: 'challenges', element: <Challenges /> },
       { path: 'profile', element: <Profile /> },
       // { path: 'analytics', element: <Analytics /> }, // Add this line
 

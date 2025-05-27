@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { Country, State, City } from "country-state-city"; // Install with: npm install country-state-city
 import DefaultImage from "../../assets/image.png";
-
+import { Link } from "react-router-dom";
 const Profile = () => {
   const { darkMode } = useTheme();
   const [selectedImage, setSelectedImage] = useState(DefaultImage);
@@ -327,12 +327,12 @@ const Profile = () => {
           </h1>
           <br />
           <div className="flex flex-col gap-1.5">
-            <a href="/profile" className="text-red-500 dark:text-red-400">
+            <Link to="/logout" className="text-red-500 dark:text-red-400">
               Logout
-            </a>
-            <a href="/profile" className="text-red-500 dark:text-red-400">
+            </Link>
+            <Link to="/logout" className="text-red-500 dark:text-red-400">
               Delete Account
-            </a>
+            </Link>
           </div>
         </div>
 

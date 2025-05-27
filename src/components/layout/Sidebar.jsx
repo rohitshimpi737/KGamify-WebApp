@@ -4,6 +4,13 @@ import { Link } from "react-router-dom";
 const Sidebar = ({ sidebarOpen, darkMode }) => {
   const menuItems = [
     {
+      name: "Home",
+      icon: "M10 0l10 8v12H0V8L10 0zm0 2.5L2 8.5V18h16V8.5l-8-6zM10 10a2 2 0 100-4 2 2 0 000 4z",
+      path: "/app",
+      end: true,
+    },
+
+    {
       name: "Profile",
       icon: "M10 0s8 7.58 8 12a8 8 0 1 1-16 0c0-4.42 8-12 8-12zM6 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
       path: "/app/profile",
@@ -38,6 +45,7 @@ const Sidebar = ({ sidebarOpen, darkMode }) => {
             <li key={item.name}>
               <NavLink
                 to={item.path}
+                end={item.end} // Add this prop
                 className={({ isActive }) =>
                   `flex items-center p-2 rounded-lg group ${
                     isActive
