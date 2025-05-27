@@ -11,7 +11,7 @@ import Settings from './components/ui/Settings';
 import AuthForm from './components/SignUp/SignUp';
 import NavigationGuard from './components/layout/NavigationGuard';
 import './index.css';
-
+import QuizPage from './components/Quiz/QuizPage';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -30,7 +30,7 @@ const router = createBrowserRouter([
       { path: 'settings', element: <Settings /> },
       { path: 'profile', element: <Profile /> },
       // { path: 'analytics', element: <Analytics /> }, // Add this line
-
+{ path: 'quiz/:challengeId', element: <QuizPage />}
     ],
   },
   {

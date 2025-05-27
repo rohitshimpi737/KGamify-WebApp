@@ -21,7 +21,59 @@ export const challenges = [
       institute: "Stanford University",
       championshipsCreated: 12,
       profilePic: "../assets/image.png"
-    }
+    },
+    questions: [
+      {
+        questionText: "Which of these is NOT part of the marketing mix (4 Ps)?",
+        options: [
+          "Product",
+          "Price",
+          "Promotion",
+          "People"
+        ],
+        correctAnswer: 3
+      },
+      {
+        questionText: "What does SWOT analysis stand for?",
+        options: [
+          "Strengths, Weaknesses, Opportunities, Threats",
+          "Sales, Workforce, Operations, Technology",
+          "Social media, Website, Outreach, Training",
+          "Strategy, Workflow, Organization, Tactics"
+        ],
+        correctAnswer: 0
+      },
+      {
+        questionText: "Which metric measures customer acquisition cost?",
+        options: [
+          "CAC",
+          "ROI",
+          "KPI",
+          "CRM"
+        ],
+        correctAnswer: 0
+      },
+      {
+        questionText: "What is the primary purpose of a brand style guide?",
+        options: [
+          "Maintain visual consistency",
+          "Track social media metrics",
+          "Manage inventory levels",
+          "Calculate profit margins"
+        ],
+        correctAnswer: 0
+      },
+      {
+        questionText: "Which digital marketing trend focuses on voice search optimization?",
+        options: [
+          "Voice SEO",
+          "Podcast marketing",
+          "Chatbot integration",
+          "Augmented reality ads"
+        ],
+        correctAnswer: 0
+      }
+    ]
   },
   {
     id: "TLmZ_8912",
@@ -44,12 +96,64 @@ export const challenges = [
       department: "Computer Science",
       institute: "MIT",
       championshipsCreated: 8,
-      profilePic: "https://www.google.com/imgres?q=profile%20pic&imgurl=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1628563694622-5a76957fd09c%3Ffm%3Djpg%26q%3D60%26w%3D3000%26ixlib%3Drb-4.1.0%26ixid%3DM3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW5zdGFncmFtJTIwcHJvZmlsZXxlbnwwfHwwfHx8MA%253D%253D&imgrefurl=https%3A%2F%2Funsplash.com%2Fs%2Fphotos%2Finstagram-profile&docid=PZA6oaTli5spTM&tbnid=n46MjSuFvq-HKM&vet=12ahUKEwj4tIGQ5MONAxX_4zgGHX6UCrIQM3oFCIABEAA..i&w=3000&h=4497&hcb=2&ved=2ahUKEwj4tIGQ5MONAxX_4zgGHX6UCrIQM3oFCIABEAA"
-    }
+      profilePic: "https://example.com/profiles/michael-chen.jpg"
+    },
+    questions: [
+      {
+        questionText: "Which data structure uses FIFO (First-In-First-Out) principle?",
+        options: [
+          "Stack",
+          "Queue",
+          "Array",
+          "Tree"
+        ],
+        correctAnswer: 1
+      },
+      {
+        questionText: "What does OOP stand for in programming?",
+        options: [
+          "Object-Oriented Programming",
+          "Operational Output Process",
+          "Optimized Organization Protocol",
+          "Open Office Platform"
+        ],
+        correctAnswer: 0
+      },
+      {
+        questionText: "Which HTTP status code means 'Not Found'?",
+        options: [
+          "200",
+          "301",
+          "404",
+          "500"
+        ],
+        correctAnswer: 2
+      },
+      {
+        questionText: "What is the time complexity of binary search?",
+        options: [
+          "O(1)",
+          "O(n)",
+          "O(log n)",
+          "O(n²)"
+        ],
+        correctAnswer: 2
+      },
+      {
+        questionText: "Which language is primarily used for Android development?",
+        options: [
+          "Swift",
+          "Kotlin",
+          "C#",
+          "Python"
+        ],
+        correctAnswer: 1
+      }
+    ]
   },
   {
     id: "XGnQ_6734",
-    title: "Play and  Win",
+    title: "Play and Win",
     subtitle: "Investment Banking Challenge",
     category: "Finance",
     status: "completed",
@@ -58,7 +162,7 @@ export const challenges = [
       duration: "30 Minutes",
       participants: "45 participants"
     },
-    eligibility: ["MBA",  "CA"],
+    eligibility: ["MBA", "CA"],
     timings: {
       starts: "January 10 10:00 AM",
       ends: "April 30 11:59 PM"
@@ -69,8 +173,58 @@ export const challenges = [
       institute: "Harvard Business School",
       championshipsCreated: 15,
       profilePic: "/images/profiles/emma-wilson.jpg"
-    }
+    },
+    questions: [
+      {
+        questionText: "What does IPO stand for?",
+        options: [
+          "Initial Public Offering",
+          "International Portfolio Organization",
+          "Investment Profit Objective",
+          "Institutional Purchase Order"
+        ],
+        correctAnswer: 0
+      },
+      {
+        questionText: "Which financial metric represents EBITDA?",
+        options: [
+          "Earnings Before Interest, Taxes, Depreciation, and Amortization",
+          "Equity-Based Investment Tax Deductible Assets",
+          "European Banking Insurance and Taxation Directive Agreement",
+          "Exchange-Based International Trade Development Assessment"
+        ],
+        correctAnswer: 0
+      },
+      {
+        questionText: "What is the primary purpose of a pitch book in investment banking?",
+        options: [
+          "Marketing a company to potential investors",
+          "Tracking stock prices",
+          "Calculating tax liabilities",
+          "Managing employee benefits"
+        ],
+        correctAnswer: 0
+      },
+      {
+        questionText: "Which ratio measures a company's liquidity?",
+        options: [
+          "Current Ratio",
+          "Debt-to-Equity Ratio",
+          "Return on Equity",
+          "Price-to-Earnings Ratio"
+        ],
+        correctAnswer: 0
+      },
+      {
+        questionText: "What does M&A stand for in corporate finance?",
+        options: [
+          "Mergers and Acquisitions",
+          "Markets and Analysis",
+          "Monetary and Assets",
+          "Management and Accounting"
+        ],
+        correctAnswer: 0
+      }
+    ]
   }
 ];
-
-

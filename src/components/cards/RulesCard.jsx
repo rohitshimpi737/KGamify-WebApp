@@ -1,16 +1,13 @@
 import { useTheme } from "../../contexts/ThemeContext";
 import { useNavigate } from "react-router-dom";
-const RulesCard = ({ onClose  }) => {
+const RulesCard = ({ onClose ,id }) => {
       const { darkMode } = useTheme();
        const navigate = useNavigate();
 
   const handleStartQuiz = () => {
-    onClose(); // Close the rules modal
-    navigate('/quiz'); // Navigate to quiz route
+    onClose();
+    navigate(`quiz/${id}`); // Include challenge ID in URL
   };
-
-      
-
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-xs z-40">
@@ -19,8 +16,10 @@ const RulesCard = ({ onClose  }) => {
           onClose ? 'relative' : 'relative'
         }   ${darkMode ? 'bg-black text-white border-1 border-orange-400':'bg-white'}`}>
           {/* Header with Title and Close Button */}
+
           <div className="flex justify-between items-center mb-4 md:mb-6">
-            <h2 className="text-xl md:text-2xl font-bold ">Rules</h2>
+            <h2 className="text-xl md:text-2xl font-bold ">Rules </h2>
+            
             <button
               onClick={onClose}
               className="p-1 md:p-2 cursor-pointer hover:bg-gray-100 rounded-full transition-colors"
@@ -40,8 +39,9 @@ const RulesCard = ({ onClose  }) => {
                 />
               </svg>
             </button>
-          </div>
 
+          </div>
+          
           {/* Rules Content */}
           <div className="mb-6 md:mb-8  space-y-3 md:space-y-4">
             <p className="text-base md:text-lg">
@@ -55,6 +55,7 @@ const RulesCard = ({ onClose  }) => {
               <li className="text-sm md:text-base">Any form of cheating will result in immediate disqualification</li>
             </ul>
           </div>
+                      <span className="text-red-400 justify-end"> ID: {id}</span> 
 
           {/* Play Button */}
           <div className="flex justify-center">

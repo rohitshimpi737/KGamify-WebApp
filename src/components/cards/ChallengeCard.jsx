@@ -8,6 +8,7 @@ const ChallengeCard = ({ challenge }) => {
   const { darkMode } = useTheme();
   const [showTeacherDetail, setShowTeacherDetail] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   return (
     <div
@@ -35,10 +36,15 @@ const ChallengeCard = ({ challenge }) => {
           </span>
         </div>
 
-        <span className={`px-3 py-1 ${
-          challenge.status === 'ongoing' ? 'bg-green-500' : 
-          challenge.status === 'upcoming' ? 'bg-yellow-500' : 'bg-gray-500'
-        } text-white rounded-full text-sm md:text-base`}>
+        <span
+          className={`px-3 py-1 ${
+            challenge.status === "ongoing"
+              ? "bg-green-500"
+              : challenge.status === "upcoming"
+              ? "bg-yellow-500"
+              : "bg-gray-500"
+          } text-white rounded-full text-sm md:text-base`}
+        >
           {challenge.status}
         </span>
       </div>
@@ -58,7 +64,9 @@ const ChallengeCard = ({ challenge }) => {
           >
             <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
           </svg>
-          <span className="text-gray-500">{challenge.details.participants.split(' ')[0]}</span>
+          <span className="text-gray-500">
+            {challenge.details.participants.split(" ")[0]}
+          </span>
         </div>
       </div>
 
@@ -71,17 +79,17 @@ const ChallengeCard = ({ challenge }) => {
             Eligibility:
           </span>
           <div className="mt-1 flex flex-wrap gap-2">
-             {challenge.eligibility.map((item, index) => (
-            <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-sm">
+            {challenge.eligibility.map((item, index) => (
+              <span
+                key={index}
+                className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-sm"
+              >
                 {item}
-            </span>
-
-             ))}
-            
+              </span>
+            ))}
           </div>
         </div>
 
-          
         <button
           className="w-12 h-12 p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
           aria-label="Teacher profile"
@@ -105,7 +113,7 @@ const ChallengeCard = ({ challenge }) => {
       </div>
 
       {/* Teacher Detail Popup */}
-      {showTeacherDetail &&  (
+      {showTeacherDetail && (
         <>
           <div
             className="fixed inset-0 bg-black/30 backdrop-blur-xs z-20"
@@ -135,7 +143,23 @@ const ChallengeCard = ({ challenge }) => {
 
       {/* Show Rules */}
       {showRules && !showTeacherDetail && (
-        <RulesCard onClose={() => setShowRules(false)} />
+        <RulesCard
+          onStart={() => {
+            setShowRules(false);
+            setShowQuiz(true);
+          }}
+          id={challenge.id}
+          onClose={() => setShowRules(false)}
+        />
+      )}
+
+      {/* Quiz start */}
+
+      {showQuiz && (
+        <QuizComponent
+          challenge={challenge}
+          onClose={() => setShowQuiz(false)}
+        />
       )}
     </div>
   );
