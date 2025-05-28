@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import TeacherDetail from "./TeacherDetail";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -12,7 +11,7 @@ const ChallengeCard = ({ challenge }) => {
 
   return (
     <div
-      onClick={() => setShowRules(!showRules)}
+      onClick={() =>challenge.status !== 'completed' ?  setShowRules(!showRules): alert('It has been ended')}
       className={`mx-auto max-w-md md:max-w-screen-md lg:max-w-[700px] rounded-xl border-1 border-orange-400 shadow-lg overflow-hidden p-4 sm:p-6 relative ${
         darkMode ? "bg-black text-white" : "bg-white text-gray-800"
       }`}
@@ -93,7 +92,7 @@ const ChallengeCard = ({ challenge }) => {
         <button
           className="w-12 h-12 p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
           aria-label="Teacher profile"
-          onClick={() => setShowTeacherDetail(!showTeacherDetail)}
+          onClick={() => challenge.status !== 'completed'? setShowTeacherDetail(!showTeacherDetail) :''}
         >
           <svg
             className="w-8 h-8 text-orange-400"

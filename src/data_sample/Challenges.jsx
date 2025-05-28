@@ -1,4 +1,4 @@
-export const challenges = [
+export const Challenges = [
   {
     id: "RKyP_2505",
     title: "Play and Win",

@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+// import Analytics from "../Analytics/Analytics";
 
 const CircularProgress = ({ percentage }) => {
   const radius = 60;
@@ -51,6 +52,8 @@ const QuizComponent = ({ challenge, onClose }) => {
   const [userAnswers, setUserAnswers] = useState([]);
   const [showError, setShowError] = useState(false);
   const navigate = useNavigate();
+
+  const [viewAnalytics, setViewAnalytics] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -108,6 +111,10 @@ const QuizComponent = ({ challenge, onClose }) => {
     setShowError(false);
   };
 
+  const handleViewAnalytics = ()=>{
+    
+  }
+
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-xs z-40">
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-2xl bg-white rounded-xl shadow-xl p-6">
@@ -129,12 +136,26 @@ const QuizComponent = ({ challenge, onClose }) => {
               >
                 Restart Quiz
               </button>
+
+
+              {/* View Analytics button  */}
+
+               <button className="px-6 py-2 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors"
+                onClick={()=> setViewAnalytics(true)}
+              >
+                View Analytics
+              </button>
+
               <button
                 onClick={handleClose}
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                className="px-6 py-2 cursor-pointer bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
               >
                 Close
               </button>
+
+             
+
+
             </div>
           </div>
         ) : (
@@ -143,7 +164,7 @@ const QuizComponent = ({ challenge, onClose }) => {
               <h2 className="text-xl font-bold">{challenge.subtitle}</h2>
               <button
                 onClick={handleClose}
-                className="p-2 hover:bg-gray-100 rounded-full"
+                className="p-2  cursor-pointer hover:bg-gray-100 rounded-full"
               >
                 <svg
                   className="w-6 h-6 text-gray-600"
@@ -184,15 +205,15 @@ const QuizComponent = ({ challenge, onClose }) => {
             </div>
 
             <div className="mb-8">
-              <h3 className="text-lg font-semibold mb-4">
+              <h3 className="text-lg  font-semibold mb-4">
                 {challenge.questions[currentQuestion].questionText}
               </h3>
-              <div className="grid gap-3">
+              <div className="grid gap-3 ">
                 {challenge.questions[currentQuestion].options.map(
                   (option, index) => (
                     <button
                       key={index}
-                      className={`p-3 text-left rounded-lg border ${
+                      className={`p-3 cursor-pointer text-left rounded-lg border ${
                         selectedOption === index
                           ? "border-orange-400 bg-orange-50"
                           : "border-gray-200"
@@ -215,7 +236,7 @@ const QuizComponent = ({ challenge, onClose }) => {
             <div className="flex justify-between items-center">
               <button
                 onClick={handleNextQuestion}
-                className="px-6 py-3 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors"
+                className="px-6 py-3 cursor-pointer bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors"
               >
                 {currentQuestion === challenge.questions.length - 1
                   ? "Finish Quiz"
@@ -225,6 +246,8 @@ const QuizComponent = ({ challenge, onClose }) => {
           </>
         )}
       </div>
+      
+
     </div>
   );
 };
