@@ -11,51 +11,44 @@ const ChallengeCard = ({ challenge }) => {
 
   return (
     <div
-      onClick={() =>challenge.status !== 'completed' ?  setShowRules(!showRules): alert('It has been ended')}
-      className={`mx-auto max-w-md md:max-w-screen-md lg:max-w-[700px] rounded-xl border-1 border-orange-400 shadow-lg overflow-hidden p-4 sm:p-6 relative ${
+      onClick={() => challenge.status !== 'completed' ? setShowRules(!showRules) : alert('It has been ended')}
+      className={`mx-auto max-w-md rounded-xl border-1 border-orange-400 shadow-lg overflow-hidden p-4 sm:p-6 relative ${
         darkMode ? "bg-black text-white" : "bg-white text-gray-800"
       }`}
     >
-      {/* Category Tags */}
-      <div className="flex flex-col sm:flex-row justify-between gap-2 mb-4">
-        <span className="text-red-400 text-sm sm:text-base">
-          {challenge.title.split("/")[0].trim()}
+      {/* Top Row: Title and ID */}
+      <div className="flex justify-between items-start mb-3">
+        <span className="text-red-400 font-medium text-base">
+          {challenge.title}
         </span>
-        <p className="text-sm sm:text-base text-gray-400">ID: {challenge.id}</p>
+        <p className="text-sm text-gray-400">ID: {challenge.id}</p>
       </div>
 
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start mb-4 gap-2">
-        <div className="flex-1">
-          <h2 className="text-xl md:text-2xl font-bold mb-1">
-            {challenge.subtitle}
-          </h2>
-          <span className="text-sm md:text-base text-gray-500">
-            {challenge.category}
-          </span>
+      {/* Second Row: Subtitle and Status */}
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h2 className="text-xl font-bold">{challenge.subtitle}</h2>
+          <span className="text-sm text-gray-500">{challenge.category}</span>
         </div>
-
         <span
           className={`px-3 py-1 ${
             challenge.status === "ongoing"
               ? "bg-green-500"
               : challenge.status === "upcoming"
               ? "bg-yellow-500"
-              : "bg-gray-500"
-          } text-white rounded-full text-sm md:text-base`}
+              : "bg-red-500"
+          } text-white rounded-full text-sm`}
         >
           {challenge.status}
         </span>
       </div>
 
-      {/* Details Section */}
-      <div className="mb-4 flex flex-col sm:flex-row justify-between gap-2">
-        <div className="flex items-center text-sm md:text-base">
-          <span>{challenge.details.questions}</span>
-          <span className="mx-2 hidden sm:inline">|</span>
-          <span>{challenge.details.duration}</span>
+      {/* Third Row: Questions and Participants */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center text-sm">
+          <span>{challenge.details.questions} | {challenge.details.duration}</span>
         </div>
-        <div className="flex items-center text-sm md:text-base">
+        <div className="flex items-center text-sm">
           <svg
             className="w-4 h-4 ml-1 text-gray-500"
             fill="currentColor"
@@ -63,36 +56,76 @@ const ChallengeCard = ({ challenge }) => {
           >
             <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
           </svg>
-          <span className="text-gray-500">
+          <span className="text-gray-500 ml-1">
             {challenge.details.participants.split(" ")[0]}
           </span>
         </div>
       </div>
 
+      {/* Border Bottom */}
       <hr className="my-4 border-t border-gray-200" />
 
-      {/* Eligibility Section & Teacher Details */}
-      <div className="flex flex-col-reverse md:flex-row justify-between items-start gap-4">
-        <div className="mb-4 flex-1">
-          <span className="text-sm md:text-base font-medium text-gray-500">
-            Eligibility:
-          </span>
-          <div className="mt-1 flex flex-wrap gap-2">
-            {challenge.eligibility.map((item, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-sm"
-              >
-                {item}
-              </span>
-            ))}
+      {/* Bottom Section: Eligibility, Dates, and Teacher */}
+      <div className="flex justify-between items-start">
+        {/* Left Column: Eligibility and Dates */}
+        <div className="flex-1">
+          {/* Eligibility with Degree Cap Icon */}
+          <div className="flex items-start mb-3">
+            <svg 
+              className="w-5 h-5 mr-2 mt-0.5 text-gray-500" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+            </svg>
+            <div className="flex flex-wrap gap-2">
+              {challenge.eligibility.map((item, index) => (
+                <span
+                  key={index}
+                  className={`px-2 py-1 rounded-md text-xs ${
+                    darkMode ? "bg-gray-800 text-gray-300" : "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Dates with Calendar Icon */}
+          <div className="flex items-center">
+            <svg 
+              className="w-5 h-5 mr-2 text-gray-500" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <div className="text-sm">
+              <div>
+                <span className="font-medium text-gray-500 mr-1">Starts:</span>
+                <span>{challenge.timings.starts}</span>
+              </div>
+              <div>
+                <span className="font-medium text-gray-500 mr-1">Ends:</span>
+                <span>{challenge.timings.ends}</span>
+              </div>
+            </div>
           </div>
         </div>
 
+        {/* Right Column: Teacher Profile */}
         <button
           className="w-12 h-12 p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
           aria-label="Teacher profile"
-          onClick={() => challenge.status !== 'completed'? setShowTeacherDetail(!showTeacherDetail) :''}
+          onClick={(e) => {
+            e.stopPropagation();
+            challenge.status !== 'completed' && setShowTeacherDetail(!showTeacherDetail);
+          }}
         >
           <svg
             className="w-8 h-8 text-orange-400"
@@ -111,7 +144,7 @@ const ChallengeCard = ({ challenge }) => {
         </button>
       </div>
 
-      {/* Teacher Detail Popup */}
+     {/* Popups */}
       {showTeacherDetail && (
         <>
           <div
@@ -120,7 +153,6 @@ const ChallengeCard = ({ challenge }) => {
           />
           <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-72 bg-white rounded-xl shadow-xl p-5">
             <TeacherDetail
-              // TEACHER PASS AS PARAMETER FOR TEACHER CARD
               teacher={challenge.teacher}
               onClose={() => setShowTeacherDetail(false)}
             />
@@ -128,19 +160,6 @@ const ChallengeCard = ({ challenge }) => {
         </>
       )}
 
-      {/* Date Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm md:text-base">
-        <div>
-          <p className="text-gray-500 font-medium">Starts:</p>
-          <p className="text-gray-700">{challenge.timings.starts}</p>
-        </div>
-        <div>
-          <p className="text-gray-500 font-medium">Ends:</p>
-          <p className="text-gray-700">{challenge.timings.ends}</p>
-        </div>
-      </div>
-
-      {/* Show Rules */}
       {showRules && !showTeacherDetail && (
         <RulesCard
           onStart={() => {
@@ -151,8 +170,6 @@ const ChallengeCard = ({ challenge }) => {
           onClose={() => setShowRules(false)}
         />
       )}
-
-      {/* Quiz start */}
 
       {showQuiz && (
         <QuizComponent

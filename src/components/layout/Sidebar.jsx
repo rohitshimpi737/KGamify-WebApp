@@ -1,15 +1,8 @@
 import { NavLink } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-const Sidebar = ({ sidebarOpen, darkMode }) => {
+const Sidebar = ({ sidebarOpen, darkMode, closeSidebar }) => {
   const menuItems = [
-    {
-      name: "Home",
-      icon: "M10 0l10 8v12H0V8L10 0zm0 2.5L2 8.5V18h16V8.5l-8-6zM10 10a2 2 0 100-4 2 2 0 000 4z",
-      path: "/app",
-      end: true,
-    },
-
     {
       name: "Profile",
       icon: "M10 0s8 7.58 8 12a8 8 0 1 1-16 0c0-4.42 8-12 8-12zM6 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
@@ -29,23 +22,47 @@ const Sidebar = ({ sidebarOpen, darkMode }) => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform border-r ${
-        darkMode ? "bg-black border-gray-700" : "bg-white border-gray-200"
-      } ${
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      } sm:translate-x-0`}
+      className={`fixed top-0 left-0 z-50 w-64 h-screen transition-transform rounded-r-2xl rounded-tr-2xl ${
+        darkMode ? "bg-black" : "bg-white"
+      } ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+      style={{
+        boxShadow: sidebarOpen ? "0 0 0 100vmax rgba(0,0,0,0.5)" : "none",
+      }}
     >
+      {/* Profile Section */}
+      <div className="bg-[#f58220] p-4  rounded-tr-2xl">
+        <div className="flex flex-col items-start">
+          <div className="bg-white p-2  rounded-full mb-1">
+            <svg 
+              className="w-7 h-7 text-orange-400" 
+              fill="currentColor" 
+              viewBox="0 0 20 20"
+            >
+              <path 
+                fillRule="evenodd" 
+                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" 
+                clipRule="evenodd" 
+              />
+            </svg>
+          </div>
+          <div className="text-left text-black">
+            <p className="font-bold text-lg">John Doe</p>
+            <p className="text-sm mt-1">john.doe@example.com</p>
+          </div>
+        </div>
+      </div>
+      
       <div
-        className={`h-full px-3 pb-4 overflow-y-auto ${
+        className={`h-full px-3 pb-4 overflow-y-auto rounded-br-lg ${
           darkMode ? "bg-black" : "bg-white"
         }`}
       >
-        <ul className="space-y-2 font-medium">
+        <ul className="space-y-2 font-medium pt-4">
           {menuItems.map((item) => (
             <li key={item.name}>
               <NavLink
                 to={item.path}
-                end={item.end} // Add this prop
+                onClick={closeSidebar}
                 className={({ isActive }) =>
                   `flex items-center p-2 rounded-lg group ${
                     isActive
@@ -72,34 +89,7 @@ const Sidebar = ({ sidebarOpen, darkMode }) => {
             </li>
           ))}
 
-          {/* Logout at bottom */}
-          <li className="absolute bottom-4 w-[calc(100%-1.5rem)]">
-            <Link
-              to="/logout" // 👈 Route to logout page
-              className={`flex items-center p-2 rounded-lg group ${
-                darkMode
-                  ? "text-white hover:bg-orange-500"
-                  : "text-gray-900 hover:bg-orange-100"
-              }`}
-            >
-              <svg
-                className={`w-5 h-5 transition duration-75 ${
-                  darkMode
-                    ? "text-gray-400 group-hover:text-white"
-                    : "text-gray-500 group-hover:text-gray-900"
-                }`}
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="ms-3">Logout</span>
-            </Link>
-          </li>
+          
         </ul>
       </div>
     </aside>

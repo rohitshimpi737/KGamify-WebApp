@@ -156,7 +156,7 @@ export const Challenges = [
     title: "Play and Win",
     subtitle: "Investment Banking Challenge",
     category: "Finance",
-    status: "completed",
+    status: "Ended",
     details: {
       questions: "20 Questions",
       duration: "30 Minutes",

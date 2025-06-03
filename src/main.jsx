@@ -12,7 +12,7 @@ import AuthForm from './components/SignUp/SignUp';
 import NavigationGuard from './components/layout/NavigationGuard';
 import './index.css';
 import QuizPage from './components/Quiz/QuizPage';
-import Analytics from './components/Analytics/Analytics';
+// import Analytics from './components/Analytics/Analytics';
 
 const router = createBrowserRouter([
   {
@@ -31,7 +31,7 @@ const router = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: 'settings', element: <Settings /> },
       { path: 'profile', element: <Profile /> },
-      { path: 'analytics', element: <Analytics /> }, // Add this line
+      // { path: 'analytics', element: <Analytics /> }, // Add this line
       { path: 'quiz/:challengeId', element: <QuizPage />}
     ],
   },
