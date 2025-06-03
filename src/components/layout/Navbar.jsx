@@ -21,7 +21,8 @@ const Navbar = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-start rtl:justify-end">
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={(e) => {
+                setSidebarOpen(!sidebarOpen)}}
               className={`inline-flex items-center p-2 text-sm rounded-lg focus:outline-none focus:ring-2 ${
                 darkMode
                   ? "text-gray-400 hover:bg-orange-500 focus:ring-gray-600"

@@ -9,9 +9,27 @@ const ChallengeCard = ({ challenge }) => {
   const [showRules, setShowRules] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
 
+
+  const handleTeacherClick = (e) => {
+  e.stopPropagation();
+  if (challenge.status !== 'completed') {
+    setShowTeacherDetail(true); // Force open teacher detail
+    setShowRules(false); // Force close rules
+  }
+};
+
+const handleCardClick = () => {
+  if (challenge.status !== 'completed') {
+    setShowRules(!showRules); // Toggle rules
+    setShowTeacherDetail(false); // Force close teacher detail
+  } else {
+    alert('It has been ended');
+  }
+};
+
   return (
     <div
-      onClick={() => challenge.status !== 'completed' ? setShowRules(!showRules) : alert('It has been ended')}
+      onClick={ !showTeacherDetail && handleCardClick}
       className={`mx-auto max-w-md rounded-xl border-1 border-orange-400 shadow-lg overflow-hidden p-4 sm:p-6 relative ${
         darkMode ? "bg-black text-white" : "bg-white text-gray-800"
       }`}
@@ -120,13 +138,10 @@ const ChallengeCard = ({ challenge }) => {
 
         {/* Right Column: Teacher Profile */}
         <button
-          className="w-12 h-12 p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
-          aria-label="Teacher profile"
-          onClick={(e) => {
-            e.stopPropagation();
-            challenge.status !== 'completed' && setShowTeacherDetail(!showTeacherDetail);
-          }}
-        >
+  className="w-12 h-12 p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
+  aria-label="Teacher profile"
+  onClick={handleTeacherClick}
+>
           <svg
             className="w-8 h-8 text-orange-400"
             fill="none"
@@ -145,7 +160,7 @@ const ChallengeCard = ({ challenge }) => {
       </div>
 
      {/* Popups */}
-      {showTeacherDetail && (
+      {showTeacherDetail &&  !showRules && (
         <>
           <div
             className="fixed inset-0 bg-black/30 backdrop-blur-xs z-20"
