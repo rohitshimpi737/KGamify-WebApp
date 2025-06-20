@@ -26,7 +26,7 @@ function App() {
         selectedFilter,
         selectedSort,
         setSelectedSort  // MUST include this
-      }} />
+      }}  />
     </Layout>
   );
 }

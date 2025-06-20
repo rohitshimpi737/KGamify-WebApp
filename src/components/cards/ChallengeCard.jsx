@@ -7,7 +7,7 @@ const ChallengeCard = ({ challenge }) => {
   const { darkMode } = useTheme();
   const [showTeacherDetail, setShowTeacherDetail] = useState(false);
   const [showRules, setShowRules] = useState(false);
-  const [showQuiz, setShowQuiz] = useState(false);
+  
 
 
   const handleTeacherClick = (e) => {
@@ -179,19 +179,13 @@ const handleCardClick = () => {
         <RulesCard
           onStart={() => {
             setShowRules(false);
-            setShowQuiz(true);
           }}
           id={challenge.id}
           onClose={() => setShowRules(false)}
         />
       )}
 
-      {showQuiz && (
-        <QuizComponent
-          challenge={challenge}
-          onClose={() => setShowQuiz(false)}
-        />
-      )}
+      
     </div>
   );
 };

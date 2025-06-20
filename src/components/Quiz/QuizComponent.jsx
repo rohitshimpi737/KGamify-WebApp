@@ -1,238 +1,286 @@
-/* eslint-disable no-unused-vars */
+// QuizComponent.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { Challenges } from "../../data_sample/Challenges";
+import { useTheme } from "../../contexts/ThemeContext"; // Import useTheme hook
 
-const CircularProgress = ({ percentage }) => {
-  const radius = 40; // Smaller for mobile
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference * (1 - percentage / 100);
+export default function QuizComponent() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { darkMode } = useTheme(); // Get dark mode state
+  const [challenge, setChallenge] = useState(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showExitPopup, setShowExitPopup] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [quizStarted, setQuizStarted] = useState(false);
+  const [userAnswers, setUserAnswers] = useState([]);
 
-  return (
-    <div className="relative w-28 h-28"> {/* Smaller container */}
-      <svg className="w-full h-full" viewBox="0 0 100 100">
-        <circle
-          className="text-gray-200"
-          strokeWidth="8"
-          stroke="currentColor"
-          fill="none"
-          cx="50"
-          cy="50"
-          r={radius}
-        />
-        <circle
-          className="text-orange-500"
-          strokeWidth="8"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          stroke="currentColor"
-          fill="none"
-          cx="50"
-          cy="50"
-          r={radius}
-          transform="rotate(-90 50 50)"
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xl font-bold"> {/* Smaller text */}
-          {Math.round(percentage)}%
-        </span>
-      </div>
-    </div>
-  );
+
+
+
+
+/*This part is logic of calculating the results only */
+const handleSubmit = () => {
+  let score = 0;
+  challenge.questions.forEach((q, idx) => {
+    if (q.correctAnswer === userAnswers[idx]) score++;
+  });
+
+  navigate(`/app/results/${id}`, { state: { score, total: challenge.questions.length } });
 };
 
-const QuizComponent = ({ challenge, onClose }) => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(challenge.details.duration * 60 || 900);
-  const [showResults, setShowResults] = useState(false);
-  const [score, setScore] = useState(0);
-  const [userAnswers, setUserAnswers] = useState([]);
-  const [showError, setShowError] = useState(false);
-  const navigate = useNavigate();
+const handleSelectOption = (option) => {
+  setSelectedOption(option);
+  const updatedAnswers = [...userAnswers];
+  updatedAnswers[currentQuestionIndex] = option;
+  setUserAnswers(updatedAnswers);
+};
 
+
+
+
+  // Find challenge by ID
   useEffect(() => {
+    const foundChallenge = Challenges.find(c => c.id === id);
+    if (foundChallenge) {
+      setChallenge(foundChallenge);
+      // Convert duration (e.g., "15 Minutes") to seconds
+      const minutes = parseInt(foundChallenge.details.duration);
+      setTimeRemaining(minutes * 60);
+    } else {
+      navigate('/app');
+    }
+  }, [id, navigate]);
+
+  // Timer effect
+  useEffect(() => {
+    if (!quizStarted || !challenge) return;
+    
     const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
+
     return () => clearInterval(timer);
+  }, [quizStarted, challenge]);
+
+  // Start quiz on component mount
+  useEffect(() => {
+    setQuizStarted(true);
   }, []);
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const calculateScore = () => {
-    let correct = 0;
-    userAnswers.forEach((answer, index) => {
-      if (answer === challenge.questions[index].correctAnswer) {
-        correct++;
-      }
-    });
-    return correct;
+  const handleExitClick = () => setShowExitPopup(true);
+  const handleClosePopup = () => setShowExitPopup(false);
+  
+  const handleConfirmExit = () => {
+    navigate('/app');
   };
 
   const handleNextQuestion = () => {
-    if (selectedOption === null) {
-      setShowError(true);
-      return;
-    }
-
-    setUserAnswers([...userAnswers, selectedOption]);
-
-    if (currentQuestion < challenge.questions.length - 1) {
-      setCurrentQuestion((prev) => prev + 1);
+    if (currentQuestionIndex < challenge.questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
       setSelectedOption(null);
-      setShowError(false);
     } else {
-      setScore(calculateScore());
-      setShowResults(true);
+      handleSubmit();
     }
   };
 
-  const handleRestart = () => {
-    setCurrentQuestion(0);
-    setSelectedOption(null);
-    setUserAnswers([]);
-    setShowResults(false);
-    setTimeLeft(challenge.details.duration * 60 || 900);
-  };
 
-  const handleOptionSelect = (index) => {
-    setSelectedOption(index);
-    setShowError(false);
-  };
+  if (!challenge) {
+    return (
+      <div className={`fixed inset-0 z-50 flex items-center justify-center ${
+        darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-800"
+      }`}>
+        Loading quiz...
+      </div>
+    );
+  }
+
+  const currentQuestion = challenge.questions[currentQuestionIndex];
+  const minutes = Math.floor(timeRemaining / 60);
+  const seconds = timeRemaining % 60;
+  const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+  const options = [
+    ...currentQuestion.options.map((opt, idx) => 
+      `${String.fromCharCode(65 + idx)}) ${opt}`
+    ),
+    "E) Report question as wrong"
+  ];
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 overflow-y-auto">
-      <div className="min-h-full p-4 flex items-center justify-center">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
-          {/* Header */}
-          <div className="bg-orange-400 p-4 text-white flex justify-between items-center">
-            <h2 className="text-lg font-bold">{challenge.subtitle}</h2>
-            <button
-              onClick={onClose}
-              className="p-1 rounded-full hover:bg-orange-500"
+    <div className={`fixed inset-0 z-50 overflow-auto ${
+      darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-800"
+    }`}>
+      <div className="max-w-md mx-auto p-4 min-h-screen flex flex-col">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
+            <h2 className={`text-lg font-semibold ${
+              darkMode ? "text-white" : "text-gray-800"
+            }`}>
+              {challenge.title}
+            </h2>
+            <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+              Ad
+            </span>
+          </div>
+          <button
+            onClick={handleExitClick}
+            className={`transition-colors ${
+              darkMode ? "text-gray-300 hover:text-red-400" : "text-gray-500 hover:text-red-500"
+            }`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
             >
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Timer & Status */}
+        <div className={`flex justify-between text-sm mb-2 ${
+          darkMode ? "text-gray-300" : "text-gray-600"
+        }`}>
+          <span>⏱ {formattedTime}</span>
+          <span>🗨️ {currentQuestionIndex + 1}/{challenge.questions.length}</span>
+          <span className="bg-orange-500 text-white px-2 py-0.5 rounded-full">
+            k 25
+          </span>
+        </div>
+
+        {/* Question */}
+        <p className={`font-medium mb-2 ${
+          darkMode ? "text-white" : "text-gray-800"
+        }`}>
+          Q {currentQuestionIndex + 1}) {currentQuestion.questionText}
+        </p>
+
+        {/* Options */}
+        <div className="mb-4 flex-grow">
+          <ul className="space-y-2">
+            {options.map((option, index) => (
+              <li
+                key={index}
+                className={`p-2 rounded cursor-pointer   ${index === options.length - 1 ? "font-semibold text-red-500" : ""}`}
+              >
+                {option}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Answer Buttons */}
+       {/* Answer Buttons */}
+<div className="grid grid-cols-5 gap-2 mb-4">
+  {["A", "B", "C", "D", "E"].map((opt) => {
+    const isSelected = selectedOption === opt;
+    const isReportButton = opt === "E";
+    
+    return (
+      <button
+        key={opt}
+        onClick={() => handleSelectOption(opt)}
+        className={`py-2 rounded-md border font-medium transition-colors ${
+          isSelected
+            ? isReportButton
+              ? "bg-red-500 text-white border-red-500"
+              : darkMode
+                ? "bg-orange-600 text-white border-orange-600"
+                : "bg-orange-500 text-white border-orange-500"
+            : isReportButton
+              ? darkMode
+                ? "border-red-500 text-red-500 hover:bg-gray-800"
+                : "border-red-500 text-red-500 hover:bg-red-50"
+              : darkMode
+                ? "border-orange-500 text-white hover:bg-gray-800"
+                : "border-orange-300 text-gray-700 hover:bg-gray-100"
+        }`}
+      >
+        {opt}
+      </button>
+    );
+  })}
+</div>
+
+        {/* Next Question Button */}
+        <button 
+          onClick={handleNextQuestion}
+          disabled={!selectedOption}
+          className={`w-full py-2 font-medium rounded-md transition-colors bg-orange-500 hover:bg-orange-600 text-black mb-8 `}
+        >
+          {currentQuestionIndex === challenge.questions.length - 1 
+            ? "Submit Quiz" 
+            : "Next Question"}
+        </button>
+
+        {/* Exit Confirmation Popup */}
+        {showExitPopup && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className={`p-6 rounded-lg shadow-md w-full max-w-sm text-center ${
+              darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-800"
+            }`}>
               <svg
-                className="w-6 h-6"
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-12 w-12 text-red-500 mx-auto mb-3"
                 fill="none"
-                stroke="currentColor"
                 viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-            </button>
-          </div>
-
-          <div className="p-5">
-            {showResults ? (
-              <div className="text-center space-y-6">
-                <h2 className="text-xl font-bold">Quiz Results</h2>
-                <div className="flex justify-center">
-                  <CircularProgress
-                    percentage={(score / challenge.questions.length) * 100}
-                  />
-                </div>
-                <p className="text-lg">
-                  You scored {score} out of {challenge.questions.length}
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={handleRestart}
-                    className="px-4 py-2 bg-orange-400 text-white rounded-lg hover:bg-orange-500"
-                  >
-                    Restart
-                  </button>
-                  <button
-                    onClick={onClose}
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                {/* Quiz Info */}
-                <div className="flex justify-between items-center mb-6">
-                  <div className="flex items-center space-x-2 text-orange-500">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span>{formatTime(timeLeft)}</span>
-                  </div>
-                  <span className="text-gray-500">
-                    Q{currentQuestion + 1}/{challenge.questions.length}
-                  </span>
-                </div>
-
-                {/* Question */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-4">
-                    {challenge.questions[currentQuestion].questionText}
-                  </h3>
-                  <div className="space-y-3">
-                    {challenge.questions[currentQuestion].options.map(
-                      (option, index) => (
-                        <button
-                          key={index}
-                          className={`w-full p-3 text-left rounded-lg border-2 transition-colors ${
-                            selectedOption === index
-                              ? "border-orange-400 bg-orange-50"
-                              : "border-gray-200 hover:border-orange-200"
-                          }`}
-                          onClick={() => handleOptionSelect(index)}
-                        >
-                          <span className="font-medium">
-                            {String.fromCharCode(65 + index)}.
-                          </span> {option}
-                        </button>
-                      )
-                    )}
-                  </div>
-                </div>
-
-                {showError && (
-                  <div className="text-red-500 text-center mb-4">
-                    Please select an answer
-                  </div>
-                )}
-
-                {/* Next Button */}
+              <h3 className={`text-lg font-bold mb-2 ${
+                darkMode ? "text-white" : "text-gray-800"
+              }`}>
+                Are you sure you want to exit the quiz?
+              </h3>
+              <p className={`text-sm mb-4 ${
+                darkMode ? "text-gray-300" : "text-gray-600"
+              }`}>
+                Your progress will not be saved.
+              </p>
+              <div className="flex justify-center gap-4">
                 <button
-                  onClick={handleNextQuestion}
-                  className="w-full py-3 bg-orange-400 text-white rounded-lg hover:bg-orange-500 font-medium"
+                  onClick={handleConfirmExit}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
                 >
-                  {currentQuestion === challenge.questions.length - 1
-                    ? "Submit Quiz"
-                    : "Next Question"}
+                  Yes
                 </button>
-              </>
-            )}
+                <button
+                  onClick={handleClosePopup}
+                  className={`px-4 py-2 border rounded-md transition-colors ${
+                    darkMode 
+                      ? "border-gray-600 hover:bg-gray-700 text-white" 
+                      : "border-gray-300 hover:bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  No
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default QuizComponent;
+}
