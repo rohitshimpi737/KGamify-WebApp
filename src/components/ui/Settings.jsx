@@ -7,13 +7,12 @@ const Settings = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-2 space-y-8">
-      {/* Header with Back Button - matching Profile component */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Link 
             to="/app" 
             className={`p-2 rounded-full ${
-              darkMode ? "bg-zinc-800 text-white" : "bg-zinc-200"
+              darkMode ? "bg-zinc-800 text-white" : "bg-zinc-500"
             }`}
           >
             <svg 
@@ -46,7 +45,7 @@ const Settings = () => {
             <button
               onClick={toggleTheme}
               className={`relative rounded-full w-12 h-6  border-1  transition-colors duration-200 ${
-                darkMode ? 'bg-orange-500' : 'bg-white'
+                darkMode ? 'bg-orange-500' : 'bg-zinc-400'
               }`}
             >
               <span

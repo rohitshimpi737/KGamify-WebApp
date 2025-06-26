@@ -46,7 +46,9 @@ const Layout = ({
   // Determine if we should show navbar
   const shouldShowNavbar = !(
     location.pathname.includes("/app/profile") || 
-    location.pathname.includes("/app/settings")
+    location.pathname.includes("/app/settings") || 
+     location.pathname.includes("/app/analytics") ||
+     location.pathname.includes("/app/leaderboard/")
   );
 
   return (

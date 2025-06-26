@@ -98,7 +98,7 @@ const Profile = () => {
         <button 
           onClick={handleBackClick}
           className={`p-2 hover:bg-zinc-300 rounded-full ${
-            darkMode ? " text-white" : ""
+            darkMode ? " text-white" : "bg-zinc-500"
           }`}
         >
           <svg 
@@ -121,7 +121,7 @@ const Profile = () => {
           <button 
             onClick={() => setIsEditing(true)}
             className={`p-2 rounded-full ${
-              darkMode ? "bg-zinc-800 text-white" : "bg-zinc-200"
+              darkMode ? "bg-zinc-800 text-white" : "bg-zinc-500"
             }`}
           >
             <svg 
@@ -192,7 +192,7 @@ const Profile = () => {
                   setUserDetails({ ...userDetails, name: e.target.value })
                 }
                 className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
-                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : ""
+                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
                 }`}
               />
             ) : (
@@ -214,7 +214,7 @@ const Profile = () => {
                   setUserDetails({ ...userDetails, age: e.target.value })
                 }
                 className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
-                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : ""
+                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
                 }`}
               />
             ) : (
@@ -236,7 +236,7 @@ const Profile = () => {
                   setUserDetails({ ...userDetails, email: e.target.value })
                 }
                 className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
-                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : ""
+                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
                 }`}
               />
             ) : (
@@ -258,7 +258,7 @@ const Profile = () => {
                   setUserDetails({ ...userDetails, phone: e.target.value })
                 }
                 className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
-                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : ""
+                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
                 }`}
               />
             ) : (

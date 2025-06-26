@@ -13,7 +13,8 @@ import NavigationGuard from './components/layout/NavigationGuard';
 import './index.css';
 import QuizComponent from './components/Quiz/QuizComponent';
 import ResultsPage from './pages/ResultPage';
-import AnalyticsPage from './components/Analytics/AnalyticsPage';
+import AnalyticsPage from "./components/Analytics/AnalyticsPage.jsx";
+import LeaderboardPage from "./components/Analytics/LeaderboardPage";
 
 const router = createBrowserRouter([
   {
@@ -32,7 +33,8 @@ const router = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: 'settings', element: <Settings /> },
       { path: 'profile', element: <Profile /> },
-      { path: 'analytics', element: <AnalyticsPage /> }, // Add this line
+      { path: 'analytics', element: <AnalyticsPage /> },
+      { path: 'leaderboard/:id', element: <LeaderboardPage /> },
       { path: 'quiz/:id', element:<QuizComponent/>},
       {path:'results/:id',element:<ResultsPage/>}
     ],
