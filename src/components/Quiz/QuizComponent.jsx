@@ -7,7 +7,7 @@ import API from "../../services/api";
 import { extractUserId, parseUserPlayResponse } from "../../utils/challengeUtils";
 
 export default function QuizComponent() {
-  
+
   // ========================================
   // HOOKS & ROUTER
   // ========================================
@@ -245,46 +245,36 @@ export default function QuizComponent() {
       }
     }
 
-    let result = 0;
-
-    if (isCorrect) {
-      if (timeTaken < expectedTimeSeconds) {
-        // Fast correct: coinPerQuestion + ((1-(actualTime / expectedTime)) * coinPerQuestion)
-        result = coinPerQuestion + ((1 - (timeTaken / expectedTimeSeconds)) * coinPerQuestion);
-      } else {
-        // Slow correct: coinPerQuestion - (((actualTime/expectedTime) - 1) * coinPerQuestion)
-        result = coinPerQuestion - (((timeTaken / expectedTimeSeconds) - 1) * coinPerQuestion);
-      }
-    } else {
-      if (timeTaken < expectedTimeSeconds) {
-        // Fast wrong: (coinPerQuestion + ((1-(actualTime / expectedTime)) * coinPerQuestion) + negativeMarks) * -1
-        result = (coinPerQuestion + ((1 - (timeTaken / expectedTimeSeconds)) * coinPerQuestion) + negativeMarks) * -1;
-      } else {
-        // Slow wrong: coinPerQuestion * -1
-        result = coinPerQuestion * -1;
-      }
-    }
-
-    // Calculate bonus and penalty for display
+    let score = 0;
     let bonus = 0;
     let penalty = 0;
 
     if (isCorrect) {
+      // Case A: Correct Answer
       if (timeTaken < expectedTimeSeconds) {
-        bonus = ((1 - (timeTaken / expectedTimeSeconds)) * coinPerQuestion);
+        // Formula: Score = C + (1 - Ta/Te) × C
+        score = coinPerQuestion + ((1 - (timeTaken / expectedTimeSeconds)) * coinPerQuestion);
+        bonus = (1 - (timeTaken / expectedTimeSeconds)) * coinPerQuestion;
       } else {
-        penalty = (((timeTaken / expectedTimeSeconds) - 1) * coinPerQuestion);
+        // Formula: Score = C - (Ta/Te - 1) × C
+        score = coinPerQuestion - (((timeTaken / expectedTimeSeconds) - 1) * coinPerQuestion);
+        penalty = ((timeTaken / expectedTimeSeconds) - 1) * coinPerQuestion;
       }
     } else {
+      // Case B: Wrong Answer
       if (timeTaken < expectedTimeSeconds) {
+        // Formula: Score = -(C + (1 - Ta/Te) × C + N)
+        score = -(coinPerQuestion + ((1 - (timeTaken / expectedTimeSeconds)) * coinPerQuestion) + negativeMarks);
         penalty = coinPerQuestion + ((1 - (timeTaken / expectedTimeSeconds)) * coinPerQuestion) + negativeMarks;
       } else {
+        // Formula: Score = -C
+        score = -coinPerQuestion;
         penalty = coinPerQuestion;
       }
     }
 
-    const finalResult = {
-      score: Math.round(result * 100) / 100,
+    return {
+      score: Math.round(score * 100) / 100,
       isCorrect,
       bonus: Math.round(bonus * 100) / 100,
       penalty: Math.round(penalty * 100) / 100,
@@ -294,23 +284,23 @@ export default function QuizComponent() {
       correctAnswer: question.correct_answer,
       userAnswer: userAnswer
     };
-
-    return finalResult;
   };
+
 
   const calculateEarlyExitPenalty = (answeredQuestions, totalQuestions) => {
     if (answeredQuestions >= totalQuestions) return 0;
 
+    // Formula: Penalty = -∑(Ci) for remaining questions
     let penalty = 0;
     for (let i = answeredQuestions; i < totalQuestions; i++) {
       if (questions[i]) {
         penalty += parseInt(questions[i].total_coins || 5);
       }
     }
-    return penalty; 
+    return penalty;
   };
 
-  
+
   // ========================================
   // USER INTERACTION HANDLERS
   // ========================================

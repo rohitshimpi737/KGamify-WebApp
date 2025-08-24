@@ -267,13 +267,26 @@ const ChallengeCard = ({ challenge }) => {
       )}
 
       {/* Rules Modal */}
+      {/* {showRules && !showTeacherDetail && (
+        <RulesCard
+          onStart={() => setShowRules(false)}
+          challenge={challenge}
+          onClose={() => setShowRules(false)}
+        />
+      )} */}
+
       {showRules && !showTeacherDetail && (
         <RulesCard
           onStart={() => setShowRules(false)}
-          challenge={challenge} // Pass original challenge for RulesCard compatibility
+          challenge={{
+            ...challengeData,
+            detailedData: challenge // Keep original data for API compatibility
+          }}
           onClose={() => setShowRules(false)}
         />
       )}
+
+
     </div>
   );
 };

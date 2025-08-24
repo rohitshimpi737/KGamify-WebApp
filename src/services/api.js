@@ -669,6 +669,40 @@ const challengeAPI = {
     }
   },
 
+   getChampionshipDetails: async (champId) => {
+    const cacheKey = getCacheKey("/fetch_details.php", { champ_id: champId });
+
+    // Check cache first
+    const cachedData = getCachedData(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    const queryParams = new URLSearchParams({
+      champ_id: champId,
+    }).toString();
+
+    const res = await apiRequest(`/fetch_details.php?${queryParams}`);
+
+    const result = res.success
+      ? {
+          success: true,
+          championship: res.data?.data || res.data,
+        }
+      : {
+          success: false,
+          error: res.error || "Failed to fetch championship details",
+        };
+
+    // Cache successful responses
+    if (result.success) {
+      setCachedData(cacheKey, result);
+    }
+
+    return result;
+  },
+  
+
   /**
    * Checks if a user has played a specific championship
    * @param {string} userId - User identifier
