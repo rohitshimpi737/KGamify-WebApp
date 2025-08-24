@@ -617,67 +617,56 @@ const quizAPI = {
 /**
  * Challenge data service for retrieving and managing educational challenges
  */
+
 const challengeAPI = {
-  /**
-   * Retrieves all available challenges with caching support
-   * @returns {Promise<Object>} All challenges response with caching
-   */
-  getAllChallenges: async () => {
-    const cacheKey = getCacheKey("/get_category.php");
+  getAllCategories: async () => {
+    try {
+      console.log('Fetching categories...');
+      const res = await apiRequest('/get_category.php');
+      console.log('Categories response:', res);
 
-    // Check cache first
-    const cachedData = getCachedData(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
-
-    const res = await apiRequest("/get_category.php");
-    const result = res.success
-      ? {
-        success: true,
-        challenges: res.data?.data || res.data,
+      if (!res.success) {
+        console.warn('getAllCategories failed:', res.error || res);
+        return [];
       }
-      : { success: false, error: res.error || "Failed to fetch challenges" };
 
-    // Cache successful responses
-    if (result.success) {
-      setCachedData(cacheKey, result);
+      const categories = Array.isArray(res.data?.data) ? res.data.data : 
+                        Array.isArray(res.data) ? res.data : [];
+      
+      console.log(`Found ${categories.length} categories:`, categories);
+      return categories;
+    } catch (error) {
+      console.error('getAllCategories error:', error);
+      return [];
     }
-
-    return result;
   },
 
-  getChampionshipDetails: async (champId) => {
-    const cacheKey = getCacheKey("/fetch_details.php", { champ_id: champId });
+  getChallengeDetails: async (champId) => {
+    try {
+      console.log(`Fetching details for challenge ${champId}...`);
+      const res = await apiRequest(`/fetch_details.php?champ_id=${encodeURIComponent(champId)}`);
+      console.log(`Challenge ${champId} response:`, res);
 
-    // Check cache first
-    const cachedData = getCachedData(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
-
-    const queryParams = new URLSearchParams({
-      champ_id: champId,
-    }).toString();
-
-    const res = await apiRequest(`/fetch_details.php?${queryParams}`);
-
-    const result = res.success
-      ? {
-        success: true,
-        championship: res.data?.data || res.data,
+      // Handle 469 and 500 errors explicitly
+      if (res.status === 469 || res.status === 500) {
+        console.warn(`Challenge ${champId} not found or error:`, res.status);
+        return null;
       }
-      : {
-        success: false,
-        error: res.error || "Failed to fetch championship details",
-      };
 
-    // Cache successful responses
-    if (result.success) {
-      setCachedData(cacheKey, result);
+      if (!res.success) {
+        console.warn(`getChallengeDetails(${champId}) failed:`, res.error || res);
+        return null;
+      }
+
+      const details = Array.isArray(res.data?.data) && res.data.data.length > 0 ? res.data.data[0] :
+                     Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : null;
+
+      console.log(`Challenge ${champId} details:`, details);
+      return details;
+    } catch (error) {
+      console.error(`getChallengeDetails error for ${champId}:`, error);
+      return null;
     }
-
-    return result;
   },
 
   /**

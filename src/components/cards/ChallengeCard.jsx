@@ -7,23 +7,47 @@ import RulesCard from "./RulesCard";
 import { validateChallengeData, getStatusStyle, getParticipantCount } from "../../utils/challengeUtils";
 
 const ChallengeCard = ({ challenge }) => {
+
   // ===========================
   // HOOKS & CONTEXT
   // ===========================
   const { darkMode } = useTheme();
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   // ===========================
   // DATA PROCESSING & VALIDATION
   // ===========================
-  const challengeData = validateChallengeData(challenge);
-  
+  const challengeData = validateChallengeData(challenge) || {
+    id: challenge?.champ_id || "unknown",
+    unique_id: challenge?.unique_id || `unique-${challenge?.champ_id || "unknown"}`,
+    mode_name: challenge?.mode_name || "Untitled Challenge",
+    title: challenge?.champ_name || "No Category",
+    category: challenge?.category_name || "General",
+    status: String(challenge?.champ_status) === "1" ? "ongoing" : "ended",
+    details: {
+      questions: challenge?.no_of_question || "0",
+      duration: challenge?.time_minutes || "00:00:00",
+      participants: challenge?.no_of_user_played || "0"
+    },
+    eligibility: [challenge?.user_qualification || "All Students"],
+    timings: {
+      starts: challenge?.start_date ? `${challenge.start_date} ${challenge.start_time || '00:00:00'}` : 'TBD',
+      ends: challenge?.end_date ? `${challenge.end_date} ${challenge.end_time || '23:59:59'}` : 'TBD'
+    },
+    teacher: {
+      id: challenge?.teacher_id || null,
+      name: challenge?.teacher_name || '',
+      image: challenge?.upload_img || null
+    },
+    detailedData: challenge
+  };
+
   // ===========================
   // USER PLAY STATUS - Moved to RulesCard for performance
   // Only check when user actually opens the challenge modal
   // ===========================
-  
+
   // ===========================
   // COMPONENT STATE
   // ===========================
@@ -33,7 +57,7 @@ const ChallengeCard = ({ challenge }) => {
   // ===========================
   // EVENT HANDLERS
   // ===========================
-  
+
   const handleTeacherClick = (e) => {
     e.stopPropagation();
     setShowTeacherDetail(true);
@@ -48,11 +72,11 @@ const ChallengeCard = ({ challenge }) => {
 
   const handleShowAnalytics = async () => {
     try {
-      navigate(`/app/analytics/${challengeData.id}`, { 
-        state: { 
+      navigate(`/app/analytics/${challengeData.id}`, {
+        state: {
           championshipId: challengeData.id,
-          fromChallengeCard: true 
-        } 
+          fromChallengeCard: true
+        }
       });
     } catch (error) {
       alert('Failed to load analytics');
@@ -63,14 +87,23 @@ const ChallengeCard = ({ challenge }) => {
   // ===========================
   // UTILITY FUNCTIONS
   // ===========================
-  
-  const getPlayStatusDisplay = () => {
-    // Status will be determined in RulesCard when user opens it
-    return (
-      <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-        ● Available - Click to view details
-      </span>
-    );
+
+  const formatDuration = (timeStr) => {
+    if (!timeStr) return '0 minutes';
+
+    // Convert HH:MM:SS to total seconds
+    const [hours, minutes, seconds] = timeStr.split(':').map(num => parseInt(num));
+    const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const remainingSeconds = totalSeconds % 60;
+
+    if (totalMinutes === 0) {
+      return `${remainingSeconds} seconds`;
+    } else if (totalMinutes === 1) {
+      return `1 minute`;
+    } else {
+      return `${totalMinutes} minutes`;
+    }
   };
 
   // ===========================
@@ -80,30 +113,25 @@ const ChallengeCard = ({ challenge }) => {
   return (
     <div
       onClick={!showTeacherDetail ? handleCardClick : undefined}
-      className={`mx-auto max-w-md rounded-xl border-1 border-orange-400 shadow-lg overflow-hidden p-4 sm:p-6 relative ${
-        darkMode ? "bg-black text-white" : "bg-white text-gray-800"
-      }`}
+      className={`mx-auto max-w-md rounded-xl border-1 border-orange-400 shadow-lg overflow-hidden p-4 sm:p-6 relative ${darkMode ? "bg-black text-white" : "bg-white text-gray-800"
+        }`}
     >
-      {/* Header Section: Title and ID */}
+      {/* Header Section: Mode  and ID */}
       <div className="flex justify-between items-start mb-3">
         <span className="text-red-400 font-medium text-base">
-          {challengeData.title}
+          {challengeData.mode_name}
         </span>
         <p className="text-sm text-gray-400">ID: {challengeData.unique_id}</p>
       </div>
 
-      {/* Title Section: Subtitle, Category, Status */}
+      {/* Title Section: title, Category, Status */}
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h2 className="text-xl font-bold">{challengeData.subtitle}</h2>
+          <h2 className="text-xl font-bold">{challengeData.title}</h2>
           <span className="text-sm text-gray-500">{challengeData.category}</span>
-          
-          {/* Play Status Indicator */}
-          <div className="mt-1">
-            {getPlayStatusDisplay()}
-          </div>
+
         </div>
-        
+
         {/* Status Badge */}
         <span
           className={`px-3 py-1 ${getStatusStyle(challengeData.status)} text-white rounded-full text-sm`}
@@ -114,8 +142,10 @@ const ChallengeCard = ({ challenge }) => {
 
       {/* Details Section: Questions, Duration, Participants */}
       <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center text-sm">
-          <span>{challengeData.details.questions} | {challengeData.details.duration}</span>
+        <div className="flex items-center text-sm text-gray-600">
+          <span>
+            {challengeData.details.questions} Questions | {formatDuration(challengeData.details.duration)}
+          </span>
         </div>
         <div className="flex items-center text-sm">
           <svg
@@ -126,7 +156,7 @@ const ChallengeCard = ({ challenge }) => {
             <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
           </svg>
           <span className="text-gray-500 ml-1">
-            {getParticipantCount(challengeData.details.participants)}
+            {challengeData.details.participants}
           </span>
         </div>
       </div>
@@ -140,10 +170,10 @@ const ChallengeCard = ({ challenge }) => {
         <div className="flex-1">
           {/* Eligibility Section */}
           <div className="flex items-start mb-3">
-            <svg 
-              className="w-5 h-5 mr-2 mt-0.5 text-gray-500" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-5 h-5 mr-2 mt-0.5 text-gray-500"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path d="M12 14l9-5-9-5-9 5 9 5z" />
@@ -154,9 +184,8 @@ const ChallengeCard = ({ challenge }) => {
               {challengeData.eligibility.map((item, index) => (
                 <span
                   key={index}
-                  className={`px-2 py-1 rounded-md text-xs ${
-                    darkMode ? "bg-gray-800 text-gray-300" : "bg-gray-100 text-gray-700"
-                  }`}
+                  className={`px-2 py-1 rounded-md text-xs ${darkMode ? "bg-gray-800 text-gray-300" : "bg-gray-100 text-gray-700"
+                    }`}
                 >
                   {item}
                 </span>
@@ -166,10 +195,10 @@ const ChallengeCard = ({ challenge }) => {
 
           {/* Timings Section */}
           <div className="flex items-center">
-            <svg 
-              className="w-5 h-5 mr-2 text-gray-500" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-5 h-5 mr-2 text-gray-500"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -189,24 +218,34 @@ const ChallengeCard = ({ challenge }) => {
 
         {/* Right Column: Teacher Profile Button */}
         <button
-          className="w-12 h-12 p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer flex items-center justify-center"
+          className="w-12 h-12 rounded-full transition-colors cursor-pointer flex items-center justify-center overflow-hidden hover:opacity-80"
           aria-label="Teacher profile"
           onClick={handleTeacherClick}
         >
-          <svg
-            className="w-8 h-8 text-orange-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          {challengeData.teacher.image ? (
+            <img
+              src={challengeData.teacher.image}
+              alt={challengeData.teacher.name}
+              className="w-full h-full object-cover rounded-full"
             />
-          </svg>
+          ) : (
+            <div className="w-full h-full bg-orange-50 flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-orange-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+          )}
         </button>
       </div>
 

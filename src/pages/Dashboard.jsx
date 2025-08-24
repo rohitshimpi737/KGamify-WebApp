@@ -1,4 +1,3 @@
-// src/pages/Dashboard.jsx
 import { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import ChallengeCard from '../components/cards/ChallengeCard';
@@ -6,7 +5,7 @@ import API from '../services/api';
 import { useAsyncState } from '../hooks/useAsyncState';
 
 function Dashboard() {
-  
+
   // ===========================
   // HOOKS & CONTEXT
   // ===========================
@@ -32,6 +31,8 @@ function Dashboard() {
   // ===========================
   // CONSTANTS & CONFIGURATION
   // ===========================
+
+  // Update FILTER_TYPES constant if not already defined
   const FILTER_TYPES = {
     QUICK_HIT: "Quick hit",
     PLAY_WIN: "Play and Win",
@@ -47,111 +48,51 @@ function Dashboard() {
   // ===========================
   // DATA LOADING & PROCESSING
   // ===========================
-  
   useEffect(() => {
     const loadChallenges = async () => {
-      const result = await API.challenge.getAllChallenges();
-      
-      if (result.success && result.challenges) {
-        const transformedChallenges = await transformChallenges(result.challenges);
-        return transformedChallenges;
-      } else {
-        throw new Error(result.error || 'Failed to fetch challenges');
+      try {
+        const categories = await API.challenge.getAllCategories();
+        if (!Array.isArray(categories)) {
+          console.warn('Categories is not an array:', categories);
+          return [];
+        }
+
+        const merged = await Promise.all(
+          categories.map(async (cat) => {
+            try {
+              const champId = cat.champ_id || cat.category_id;
+              if (!champId) return null;
+
+              const details = await API.challenge.getChallengeDetails(champId);
+              if (!details) return null;
+
+              // Only return challenges with active status
+              if (String(details.champ_status) !== "1" || String(details.category_status) !== "1") {
+                return null;
+              }
+
+              return { ...cat, ...details };
+            } catch (err) {
+              console.error(`Error processing category:`, err);
+              return null;
+            }
+          })
+        );
+
+        return merged.filter(Boolean);
+      } catch (error) {
+        console.error('loadChallenges error:', error);
+        return [];
       }
     };
 
     executeAsync(loadChallenges);
   }, [executeAsync]);
 
-  const transformChallenges = async (apiChallenges) => {
-    if (!Array.isArray(apiChallenges)) {
-      console.warn('API challenges is not an array:', apiChallenges);
-      return [];
-    }
-
-    console.log(`Transforming ${apiChallenges.length} challenges with lazy loading...`);
-    
-    // Transform challenges without fetching details immediately (lazy loading)
-    return apiChallenges.map((champ, index) => {
-      try {
-        // Calculate status based on dates
-        const status = calculateChallengeStatus(champ);
-
-        // Transform data with basic info only - details will be loaded on demand
-        const transformedChallenge = {
-          id: champ.champ_id || `challenge-${index}`,
-          unique_id: champ.champ_id || `unique-${index}`,
-          title: 'Play and Win', // Default, will be updated when details load
-          subtitle: champ.champ_name || 'Unnamed Challenge',
-          category: champ.category_name || 'General',
-          status: status,
-          details: {
-            questions: '10 Questions', // Default values
-            duration: '15 Minutes',
-            participants: '0 participants'
-          },
-          eligibility: ["All Students"],
-          timings: {
-            starts: formatDate(champ.start_date, champ.start_time),
-            ends: formatDate(champ.end_date, champ.end_time)
-          },
-          teacher: {
-            name: "",
-            department: champ.category_name || "General",
-            institute: "KGamify Platform",
-            championshipsCreated: 1,
-            profilePic: null
-          },
-          originalData: champ,
-          detailedData: null,
-          // Lazy loading flags
-          detailsLoaded: false,
-          isLoadingDetails: false
-        };
-
-        console.log(`Transformed challenge ${index + 1} (basic):`, transformedChallenge.subtitle);
-        return transformedChallenge;
-        
-      } catch (transformError) {
-        console.error(`Error transforming challenge ${index}:`, transformError);
-        // Return a minimal valid challenge object
-        return {
-          id: champ.champ_id || `error-challenge-${index}`,
-          unique_id: champ.champ_id || `error-unique-${index}`,
-          title: 'Play and Win',
-          subtitle: champ.champ_name || 'Challenge (Error)',
-          category: champ.category_name || 'General',
-          status: 'upcoming',
-          details: {
-            questions: '10 Questions',
-            duration: '15 Minutes',
-            participants: '0 participants'
-          },
-          eligibility: ["All Students"],
-          timings: {
-            starts: 'TBD',
-            ends: 'TBD'
-          },
-          teacher: {
-            name: "System Administrator",
-            department: "General",
-            institute: "KGamify Platform",
-            championshipsCreated: 1,
-            profilePic: null
-          },
-          originalData: champ,
-          detailedData: null,
-          detailsLoaded: false,
-          isLoadingDetails: false
-        };
-      }
-    });
-  };
-
   // ===========================
   // UTILITY FUNCTIONS
   // ===========================
-  
+
   const calculateChallengeStatus = (champ) => {
     try {
       const now = new Date();
@@ -171,57 +112,34 @@ function Dashboard() {
     }
   };
 
-  const formatDuration = (timeStr) => {
-    if (!timeStr) return '15 Minutes';
-    try {
-      const [hours, minutes] = timeStr.split(':').map(Number);
-      if (isNaN(hours) || isNaN(minutes)) return '15 Minutes';
-      return hours > 0 ? `${hours}h ${minutes}m` : `${minutes} Minutes`;
-    } catch (error) {
-      return '15 Minutes';
-    }
-  };
-
-  const formatDate = (dateStr, timeStr) => {
-    try {
-      const date = new Date(`${dateStr} ${timeStr || '00:00:00'}`);
-      if (isNaN(date.getTime())) return 'TBD';
-      
-      return date.toLocaleDateString('en-US', {
-        month: 'long', 
-        day: 'numeric', 
-        hour: 'numeric', 
-        minute: '2-digit', 
-        hour12: true
-      });
-    } catch (error) {
-      return 'TBD';
-    }
-  };
-
   // ===========================
   // FILTERING & SORTING LOGIC
   // ===========================
-  
+
+
   const getFilteredChallenges = () => {
     try {
       if (!Array.isArray(challenges)) return [];
-      
+
       const lowerQuery = searchQuery.toLowerCase().trim();
 
       return challenges.filter(challenge => {
         if (!challenge) return false;
-        
-        // Search filter
-        const matchesSearch = !lowerQuery || 
-          challenge.title?.toLowerCase().includes(lowerQuery) ||
-          challenge.subtitle?.toLowerCase().includes(lowerQuery) ||
-          challenge.category?.toLowerCase().includes(lowerQuery);
 
-        // Type filter
-        const matchesFilter = selectedFilter === 'Show All' || 
-                             !selectedFilter || 
-                             challenge.title === selectedFilter;
+        // Search filter - check multiple fields
+        const matchesSearch = !lowerQuery || [
+          challenge.champ_name,
+          challenge.category_name,
+          challenge.mode_name,
+          challenge.user_qualification,
+          challenge.teacher_name
+        ].some(field => field?.toLowerCase()?.includes(lowerQuery));
+
+        // Type filter based on mode_name
+        const matchesFilter =
+          selectedFilter === FILTER_TYPES.SHOW_ALL ||
+          (selectedFilter === FILTER_TYPES.QUICK_HIT && challenge.mode_name?.toLowerCase() === 'quick_hit') ||
+          (selectedFilter === FILTER_TYPES.PLAY_WIN && challenge.mode_name?.toLowerCase() !== 'quick_hit');
 
         return matchesSearch && matchesFilter;
       });
@@ -239,21 +157,50 @@ function Dashboard() {
       return [...filtered].sort((a, b) => {
         try {
           switch (selectedSort) {
-            case 'A-Z':
-              return (a.subtitle || '').localeCompare(b.subtitle || '');
-            
-            case 'STATUS': {
-              const statusOrder = { 'ongoing': 0, 'upcoming': 1, 'completed': 2 };
-              const aOrder = statusOrder[a.status] ?? 3;
-              const bOrder = statusOrder[b.status] ?? 3;
-              return aOrder - bOrder;
+            case 'A-Z': {
+              // Sort by championship name
+              const aName = a?.champ_name || '';
+              const bName = b?.champ_name || '';
+              return aName.localeCompare(bName);
             }
-            
+
+            case 'STATUS': {
+              // Define priority for each status
+              const statusPriority = {
+                'ongoing': 0,
+                'upcoming': 1,
+                'completed': 2,
+                'ended': 3
+              };
+
+              // Get current status for both challenges
+              const aStatus = calculateChallengeStatus(a);
+              const bStatus = calculateChallengeStatus(b);
+
+              // First sort by status priority
+              const statusDiff = (statusPriority[aStatus] || 999) - (statusPriority[bStatus] || 999);
+              if (statusDiff !== 0) return statusDiff;
+
+              // If same status, sort by start date
+              const aDate = new Date(`${a.start_date} ${a.start_time || '00:00:00'}`);
+              const bDate = new Date(`${b.start_date} ${b.start_time || '00:00:00'}`);
+              return bDate - aDate;
+            }
+
             case 'DATE':
             default: {
-              const aDate = new Date(a.originalData?.start_date || '1970-01-01');
-              const bDate = new Date(b.originalData?.start_date || '1970-01-01');
-              return bDate - aDate; // Changed to bDate - aDate for newest first
+              // Sort by start date, most recent first
+              const aDate = new Date(`${a.start_date} ${a.start_time || '00:00:00'}`);
+              const bDate = new Date(`${b.start_date} ${b.start_time || '00:00:00'}`);
+
+              if (isNaN(aDate.getTime())) return 1;  // Invalid dates go to end
+              if (isNaN(bDate.getTime())) return -1;
+
+              const dateDiff = bDate - aDate;
+              if (dateDiff !== 0) return dateDiff;
+
+              // If same date, sort by name as secondary criteria
+              return (a?.champ_name || '').localeCompare(b?.champ_name || '');
             }
           }
         } catch (sortError) {
@@ -262,15 +209,16 @@ function Dashboard() {
         }
       });
     } catch (error) {
-      console.error('Error sorting challenges:', error);
+      console.error('Error in getSortedChallenges:', error);
       return [];
     }
   };
 
+
   // ===========================
   // EVENT HANDLERS
   // ===========================
-  
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -291,7 +239,7 @@ function Dashboard() {
   // ===========================
   // COMPUTED VALUES
   // ===========================
-  
+
   const displayedChallenges = getSortedChallenges();
   const hasResults = displayedChallenges.length > 0;
   const isFiltered = searchQuery.trim() || selectedFilter !== 'Show All';
@@ -299,7 +247,7 @@ function Dashboard() {
   // ===========================
   // RENDER HELPERS
   // ===========================
-  
+
   const renderLoadingState = () => (
     <div className={`col-span-full text-center p-8 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
       <div className="animate-pulse">Loading challenges...</div>
@@ -309,8 +257,8 @@ function Dashboard() {
   const renderErrorState = () => (
     <div className={`col-span-full text-center p-8 text-sm ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
       <div className="mb-2">⚠️ {error}</div>
-      <button 
-        onClick={() => window.location.reload()} 
+      <button
+        onClick={() => window.location.reload()}
         className="text-xs underline hover:no-underline"
       >
         Reload Page
@@ -320,7 +268,7 @@ function Dashboard() {
 
   const renderEmptyState = () => (
     <div className={`col-span-full text-center p-8 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-      {isFiltered 
+      {isFiltered
         ? `No challenges match your ${searchQuery ? 'search' : 'filter'} criteria`
         : 'No challenges available at the moment'
       }
@@ -342,11 +290,10 @@ function Dashboard() {
             placeholder="Search challenges..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className={`w-full px-3 py-2 pl-9 text-sm rounded-lg border focus:outline-none focus:ring-1 ${
-              darkMode
-                ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500'
-                : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500 focus:ring-orange-500 focus:border-orange-500'
-            }`}
+            className={`w-full px-3 py-2 pl-9 text-sm rounded-lg border focus:outline-none focus:ring-1 ${darkMode
+              ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500'
+              : 'bg-white border-gray-200 text-gray-900 placeholder-gray-500 focus:ring-orange-500 focus:border-orange-500'
+              }`}
           />
           {searchQuery && (
             <button
@@ -368,15 +315,14 @@ function Dashboard() {
             <button
               key={type}
               onClick={() => handleFilterChange(type)}
-              className={`px-3 py-1.5 text-xs rounded-lg font-medium ${
-                darkMode
-                  ? selectedFilter === type
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-gray-800 text-white hover:bg-gray-700'
-                  : selectedFilter === type
+              className={`px-3 py-1.5 text-xs rounded-lg font-medium ${darkMode
+                ? selectedFilter === type
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-gray-800 text-white hover:bg-gray-700'
+                : selectedFilter === type
                   ? 'bg-orange-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+                }`}
             >
               {type}
             </button>
@@ -407,13 +353,11 @@ function Dashboard() {
                 <button
                   key={option.value}
                   onClick={() => handleSortChange(option.value)}
-                  className={`w-full px-4 py-3 text-left flex items-center ${
-                    darkMode ? 'text-white hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
-                  } ${
-                    selectedSort === option.value
+                  className={`w-full px-4 py-3 text-left flex items-center ${darkMode ? 'text-white hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+                    } ${selectedSort === option.value
                       ? darkMode ? 'bg-orange-500 bg-opacity-20' : 'bg-orange-100'
                       : ''
-                  }`}
+                    }`}
                 >
                   <span className="flex-1">{option.label}</span>
                   {selectedSort === option.value && (
@@ -435,11 +379,16 @@ function Dashboard() {
         ) : error ? (
           renderErrorState()
         ) : hasResults ? (
-          displayedChallenges.map(challenge => (
-            <div key={challenge.id} className="w-full">
-              <ChallengeCard challenge={challenge} />
-            </div>
-          ))
+          displayedChallenges
+            .filter(Boolean) // Remove any null/undefined entries
+            .map(challenge => (
+              <div
+                key={challenge?.champ_id || challenge?.id || Math.random().toString(36).substr(2, 9)}
+                className="w-full"
+              >
+                <ChallengeCard challenge={challenge} />
+              </div>
+            ))
         ) : (
           renderEmptyState()
         )}

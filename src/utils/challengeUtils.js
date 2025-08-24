@@ -5,26 +5,47 @@ export const extractUserId = (user) => {
 
 export const validateChallengeData = (challenge) => {
   if (!challenge) return null;
-  
+
+  // Check active status - both must be "1"
+  if (String(challenge.champ_status) !== "1" || String(challenge.category_status) !== "1") {
+    return null;
+  }
+
+  // Calculate status based on dates and times
+  const now = new Date();
+  const startDateTime = new Date(`${challenge.start_date} ${challenge.start_time || '00:00:00'}`);
+  const endDateTime = new Date(`${challenge.end_date} ${challenge.end_time || '23:59:59'}`);
+
+  let status = "upcoming";
+  if (now >= startDateTime && now <= endDateTime) {
+    status = "ongoing";
+  } else if (now > endDateTime) {
+    status = "ended";
+  }
+
   return {
-    id: challenge?.id || "N/A",
-    unique_id: challenge?.unique_id || `unique-${challenge?.id || "N/A"}`,
-    title: challenge?.title || "Challenge",
-    subtitle: challenge?.subtitle || "Championship", 
-    category: challenge?.category || "General",
-    status: challenge?.status || "upcoming",
-    details: {
-      questions: challenge?.details?.questions || "Questions",
-      duration: challenge?.details?.duration || "Duration",
-      participants: challenge?.details?.participants || "0 participants"
+    id: challenge?.id || challenge?.champ_id || "N/A",
+    unique_id: challenge?.unique_id || `unique-${challenge?.champ_id || "N/A"}`,
+    mode_name: challenge?.mode_name || challenge?.title || "Untitled Challenge",
+    title: challenge?.champ_name || challenge?.subtitle || "Championship",
+    category: challenge?.category_name || challenge?.category || "General",
+    status: status, // Use the calculated status
+   details: {
+      questions: challenge?.no_of_question || challenge?.details?.questions || "0",
+      duration: challenge?.time_minutes || challenge?.details?.duration || "00:00:00",
+      participants: challenge?.no_of_user_played || "0" // Simplified this line
     },
-    eligibility: Array.isArray(challenge?.eligibility) ? challenge.eligibility : ["All Students"],
+    eligibility: [challenge?.user_qualification || "All Students"],
     timings: {
-      starts: challenge?.timings?.starts || "TBD",
-      ends: challenge?.timings?.ends || "TBD"
+      starts: `${challenge?.start_date} ${challenge?.start_time}`,
+      ends: `${challenge?.end_date} ${challenge?.end_time}`
     },
-    teacher: challenge?.teacher || {},
-    detailedData: challenge?.detailedData || {}
+    teacher: {
+      id: challenge?.teacher_id,
+      name: challenge?.teacher_name,
+      image: challenge?.upload_img
+    },
+    detailedData: challenge
   };
 };
 
@@ -60,17 +81,15 @@ export const getStatusStyle = (status) => {
   const statusMap = {
     ongoing: "bg-green-500",
     upcoming: "bg-yellow-500", 
-    completed: "bg-red-500",
-    ended: "bg-red-500"
+    ended: "bg-red-500",
+    completed: "bg-red-500"
   };
   return statusMap[status?.toLowerCase()] || "bg-gray-500";
 };
 
-export const getParticipantCount = (participantText) => {
-  if (typeof participantText === 'string' && participantText.includes(' ')) {
-    return participantText.split(" ")[0];
-  }
-  return "0";
+export const getParticipantCount = (count) => {
+  if (!count) return "0";
+  return String(count);
 };
 
 // ===========================
