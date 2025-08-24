@@ -1,4 +1,43 @@
-const TeacherDetail = ({ onClose, teacher }) => {
+import { useState, useEffect } from 'react';
+import API from '../../services/api';
+
+const TeacherDetail = ({ onClose, teacher, teacherId }) => {
+  const [teacherDetails, setTeacherDetails] = useState(teacher || null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Load detailed teacher info if we have teacherId but no detailed data
+  useEffect(() => {
+    const loadTeacherDetails = async () => {
+      if (teacherId && (!teacher || !teacher.detailedLoaded)) {
+        setIsLoading(true);
+        setError(null);
+        
+        try {
+          const result = await API.teacher.getTeacherDetails(teacherId);
+          
+          if (result.success && result.teacher) {
+            setTeacherDetails({
+              ...teacher,
+              ...result.teacher,
+              detailedLoaded: true
+            });
+          } else {
+            setError('Failed to load teacher details');
+          }
+        } catch (err) {
+          console.error('Error loading teacher details:', err);
+          setError('Failed to load teacher details');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadTeacherDetails();
+  }, [teacherId, teacher]);
+
+  const displayTeacher = teacherDetails || teacher;
   return (
     <div className={`w-full`}>
       {/* Header Section */}
@@ -49,24 +88,50 @@ const TeacherDetail = ({ onClose, teacher }) => {
 
       {/* Rest of the content remains the same */}
       <h3 className="text-lg font-semibold text-center mb-6 text-gray-800">
-        {teacher.name}
+        {isLoading ? "Loading..." : displayTeacher?.name || "Unknown Teacher"}
       </h3>
+
+      {error && (
+        <div className="text-center mb-4 text-red-500 text-sm">
+          {error}
+        </div>
+      )}
 
       <div className="space-y-3 text-sm">
         <div className="flex justify-between">
           <span className="text-gray-500">Department:</span>
-          <span className="text-gray-700 font-medium">{teacher.department}</span>
+          <span className="text-gray-700 font-medium">
+            {isLoading ? "Loading..." : displayTeacher?.department || "N/A"}
+          </span>
         </div>
 
         <div className="flex justify-between">
           <span className="text-gray-500">Institute:</span>
-          <span className="text-gray-700 font-medium">{teacher.institute}</span>
+          <span className="text-gray-700 font-medium">
+            {isLoading ? "Loading..." : displayTeacher?.institute || "N/A"}
+          </span>
         </div>
 
         <div className="flex justify-between">
           <span className="text-gray-500">Championships:</span>
-          <span className="text-gray-700 font-medium">{teacher.championshipsCreated}</span>
+          <span className="text-gray-700 font-medium">
+            {isLoading ? "Loading..." : displayTeacher?.championshipsCreated || "0"}
+          </span>
         </div>
+
+        {displayTeacher?.email && (
+          <div className="flex justify-between">
+            <span className="text-gray-500">Email:</span>
+            <span className="text-gray-700 font-medium">{displayTeacher.email}</span>
+          </div>
+        )}
+
+        {displayTeacher?.phone && (
+          <div className="flex justify-between">
+            <span className="text-gray-500">Phone:</span>
+            <span className="text-gray-700 font-medium">{displayTeacher.phone}</span>
+          </div>
+        )}
       </div>
     </div>
   );

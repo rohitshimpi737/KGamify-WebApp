@@ -1,33 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
-import { Country, State, City } from "country-state-city";
+import { useAuth } from "../../contexts/AuthContext";
 import DefaultImage from "../../assets/image.png";
 import { Link, useNavigate } from "react-router-dom";
+import { useProfile } from "../../hooks/useProfile";
+import { useLocation } from "../../hooks/useLocation";
 
 const Profile = () => {
   const { darkMode } = useTheme();
-  const [selectedImage, setSelectedImage] = useState(DefaultImage);
-  const [userDetails, setUserDetails] = useState({
-    name: "John Doe",
-    age: "30",
-    email: "john.doe@example.com",
-    phone: "123-456-7890",
-    country: "US",
-    state: "CA",
-    city: "Los Angeles",
-  });
-
-  const [countries, setCountries] = useState([]);
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [selectedInterests, setSelectedInterests] = useState(["Video Games", "Music", "Programming"]);
-  const [isEditing, setIsEditing] = useState(false);
-
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
   
+  // Custom hooks for profile and location management
+  const {
+    profileData,
+    isSaving,
+    error,
+    updateField,
+    updateLocation,
+    toggleInterest,
+    saveProfile,
+    resetProfile
+  } = useProfile();
+  
+  const { countries, states, cities, getDisplayNames } = useLocation(profileData);
+  const { country: countryName, state: stateName } = getDisplayNames();
+
+  // Local UI state
+  const [selectedImage, setSelectedImage] = useState(DefaultImage);
+  const [isEditing, setIsEditing] = useState(false);
+
   const interestsList = [
     "Video Games",
-    "Travelling",
+    "Travelling", 
     "Music",
     "Puzzles",
     "Movies",
@@ -38,58 +43,49 @@ const Profile = () => {
     "Programming",
   ];
 
-  useEffect(() => {
-    const loadedCountries = Country.getAllCountries();
-    setCountries(loadedCountries);
-  }, []);
-
-  useEffect(() => {
-    if (userDetails.country) {
-      const loadedStates = State.getStatesOfCountry(userDetails.country);
-      setStates(loadedStates);
-    }
-  }, [userDetails.country]);
-
-  useEffect(() => {
-    if (userDetails.state) {
-      const loadedCities = City.getCitiesOfState(
-        userDetails.country,
-        userDetails.state
-      );
-      setCities(loadedCities);
-    }
-  }, [userDetails.country, userDetails.state]);
-
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result);
-      };
+      reader.onloadend = () => setSelectedImage(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  const toggleInterest = (interest) => {
-    setSelectedInterests((prev) =>
-      prev.includes(interest)
-        ? prev.filter((item) => item !== interest)
-        : [...prev, interest]
-    );
+  const handleSaveChanges = async () => {
+    const success = await saveProfile();
+    if (success) {
+      setIsEditing(false);
+      // Show success message (optional)
+      // Profile updated successfully!
+    }
   };
-
-  // Get display names for location
-  const countryName = countries.find(c => c.isoCode === userDetails.country)?.name || '';
-  const stateName = states.find(s => s.isoCode === userDetails.state)?.name || '';
 
   const handleBackClick = () => {
     if (isEditing) {
-      setIsEditing(false); // Exit edit mode if currently editing
+      setIsEditing(false);
     } else {
-      navigate(-1); // Go back in history if not editing
+      navigate(-1);
     }
   };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin h-10 w-10 border-b-2 border-orange-500 rounded-full"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    navigate("/");
+    return null;
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-2 space-y-8">
@@ -164,9 +160,21 @@ const Profile = () => {
         </div>
         <div className="flex flex-col">
           <h2 className={`text-2xl font-bold text-black ${darkMode ? 'text-white': ''}`}>
-            {userDetails.name}
+            {profileData.name || "User"}
           </h2>
-          <p className="text-gray-500 dark:text-gray-300">ID: #USR_2023_001</p>
+          <p className="text-gray-500 dark:text-gray-300">
+            {user?.user_id ? `ID: ${user.user_id}` : `Email: ${user?.email || "Unknown"}`}
+          </p>
+          {user?.recent_login && (
+            <p className="text-gray-400 dark:text-gray-400 text-sm">
+              Last login: {new Date(user.recent_login).toLocaleDateString()}
+            </p>
+          )}
+          {user?.first_login && (
+            <p className="text-gray-400 dark:text-gray-400 text-sm">
+              Member since: {new Date(user.first_login).toLocaleDateString()}
+            </p>
+          )}
         </div>
       </div>
       {/* Details Section */}
@@ -187,17 +195,15 @@ const Profile = () => {
               <input
                 placeholder="FirstName LastName"
                 type="text"
-                value={userDetails.name}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, name: e.target.value })
-                }
+                value={profileData.name}
+                onChange={(e) => updateField('name', e.target.value)}
                 className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
                   darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
                 }`}
               />
             ) : (
               <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
-                {userDetails.name}
+                {profileData.name}
               </div>
             )}
           </div>
@@ -209,17 +215,15 @@ const Profile = () => {
               <input
                 placeholder="eg.99"
                 type="number"
-                value={userDetails.age}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, age: e.target.value })
-                }
+                value={profileData.age}
+                onChange={(e) => updateField('age', e.target.value)}
                 className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
                   darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
                 }`}
               />
             ) : (
               <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
-                {userDetails.age}
+                {profileData.age}
               </div>
             )}
           </div>
@@ -231,17 +235,15 @@ const Profile = () => {
               <input
                 placeholder="example@gmail.com"
                 type="email"
-                value={userDetails.email}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, email: e.target.value })
-                }
+                value={profileData.email}
+                onChange={(e) => updateField('email', e.target.value)}
                 className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
                   darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
                 }`}
               />
             ) : (
               <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
-                {userDetails.email}
+                {profileData.email}
               </div>
             )}
           </div>
@@ -253,17 +255,35 @@ const Profile = () => {
               <input
                 placeholder="0123456789"
                 type="tel"
-                value={userDetails.phone}
-                onChange={(e) =>
-                  setUserDetails({ ...userDetails, phone: e.target.value })
-                }
+                value={profileData.phone}
+                onChange={(e) => updateField('phone', e.target.value)}
                 className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
                   darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
                 }`}
               />
             ) : (
               <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
-                {userDetails.phone}
+                {profileData.phone}
+              </div>
+            )}
+          </div>
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? "text-zinc-400" : "text-zinc-700"}`}>
+              Qualification
+            </label>
+            {isEditing ? (
+              <input
+                placeholder="e.g. Bachelor's Degree"
+                type="text"
+                value={profileData.qualification}
+                onChange={(e) => updateField('qualification', e.target.value)}
+                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
+                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
+                }`}
+              />
+            ) : (
+              <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
+                {profileData.qualification || "Not specified"}
               </div>
             )}
           </div>
@@ -282,10 +302,8 @@ const Profile = () => {
               </label>
               {isEditing ? (
                 <select
-                  value={userDetails.country}
-                  onChange={(e) =>
-                    setUserDetails({ ...userDetails, country: e.target.value })
-                  }
+                  value={profileData.country}
+                  onChange={(e) => updateLocation('country', e.target.value)}
                   className="w-full p-2 border text-zinc-600 rounded-md border-zinc-500 outline-none cursor-pointer"
                 >
                   <option value="">Select Country</option>
@@ -297,7 +315,7 @@ const Profile = () => {
                 </select>
               ) : (
                 <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
-                  {countryName}
+                  {countryName || "Not specified"}
                 </div>
               )}
             </div>
@@ -307,12 +325,10 @@ const Profile = () => {
               </label>
               {isEditing ? (
                 <select
-                  value={userDetails.state}
-                  onChange={(e) =>
-                    setUserDetails({ ...userDetails, state: e.target.value })
-                  }
+                  value={profileData.state}
+                  onChange={(e) => updateLocation('state', e.target.value)}
                   className="w-full p-2 text-zinc-600 border border-zinc-500 rounded-md outline-none cursor-pointer"
-                  disabled={!userDetails.country}
+                  disabled={!profileData.country}
                 >
                   <option value="">Select State</option>
                   {states.map((state) => (
@@ -323,7 +339,7 @@ const Profile = () => {
                 </select>
               ) : (
                 <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
-                  {stateName}
+                  {stateName || "Not specified"}
                 </div>
               )}
             </div>
@@ -333,12 +349,10 @@ const Profile = () => {
               </label>
               {isEditing ? (
                 <select
-                  value={userDetails.city}
-                  onChange={(e) =>
-                    setUserDetails({ ...userDetails, city: e.target.value })
-                  }
+                  value={profileData.city}
+                  onChange={(e) => updateLocation('city', e.target.value)}
                   className="w-full p-2 border text-zinc-600 border-zinc-500 rounded-md outline-none cursor-pointer"
-                  disabled={!userDetails.state}
+                  disabled={!profileData.state}
                 >
                   <option value="">Select City</option>
                   {cities.map((city) => (
@@ -349,7 +363,7 @@ const Profile = () => {
                 </select>
               ) : (
                 <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
-                  {userDetails.city}
+                  {profileData.city || "Not specified"}
                 </div>
               )}
             </div>
@@ -369,14 +383,14 @@ const Profile = () => {
                   type="button"
                   onClick={() => toggleInterest(interest)}
                   className={`px-4 py-2 cursor-pointer rounded-full text-sm border-orange-500 ${
-                    selectedInterests.includes(interest)
+                    profileData.interests.includes(interest)
                       ? "bg-[#f58220] text-white"
                       : `bg-[#fcf8ff] border ${darkMode ? 'bg-zinc-800 text-white border-orange-200' : 'text-black'}`
                   }`}
                 >
                   {interest}
                 </button>
-              ) : selectedInterests.includes(interest) ? (
+              ) : profileData.interests.includes(interest) ? (
                 <span
                   key={interest}
                   className={`px-4 py-2 rounded-full text-sm bg-[#f58220] text-white`}
@@ -394,24 +408,49 @@ const Profile = () => {
             Manage Account
           </h1>
           <div className="flex flex-col gap-1.5">
-            <Link to="/logout" className="text-red-500 dark:text-red-400">
+            <button 
+              onClick={handleLogout}
+              className="text-red-500 dark:text-red-400 text-left hover:text-red-600 transition-colors"
+            >
               Logout
-            </Link>
-            <Link to="/logout" className="text-red-500 dark:text-red-400">
+            </button>
+            <Link to="/logout" className="text-red-500 dark:text-red-400 hover:text-red-600 transition-colors">
               Delete Account
             </Link>
           </div>
         </div>
 
-        {/* Save Button */}
+        {/* Save Button - Only visible in edit mode */}
         {isEditing && (
           <div className="pt-6">
-            <button 
-              className="px-6 py-2 cursor-pointer bg-[#f58220] text-white rounded-md hover:bg-[#e67300] transition"
-              onClick={() => setIsEditing(false)}
-            >
-              Save Changes
-            </button>
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                {error}
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button 
+                className={`px-6 py-2 rounded-md transition ${
+                  isSaving 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-[#f58220] hover:bg-[#e67300] cursor-pointer'
+                } text-white`}
+                onClick={handleSaveChanges}
+                disabled={isSaving}
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button 
+                className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition"
+                onClick={() => {
+                  resetProfile();
+                  setIsEditing(false);
+                }}
+                disabled={isSaving}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
       </div>

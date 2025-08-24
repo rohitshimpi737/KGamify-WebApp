@@ -1,7 +1,9 @@
 import { NavLink } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Sidebar = ({ sidebarOpen, darkMode, closeSidebar }) => {
+  const { user } = useAuth();
   const menuItems = [
     {
       name: "Profile",
@@ -46,8 +48,8 @@ const Sidebar = ({ sidebarOpen, darkMode, closeSidebar }) => {
             </svg>
           </div>
           <div className="text-left text-black">
-            <p className="font-bold text-lg">John Doe</p>
-            <p className="text-sm mt-1">john.doe@example.com</p>
+            <p className="font-bold text-lg">{user?.user_name || user?.name || "User"}</p>
+            <p className="text-sm mt-1">{user?.email || "No email"}</p>
           </div>
         </div>
       </div>

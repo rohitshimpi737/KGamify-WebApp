@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
 import App from './App';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
@@ -13,8 +14,10 @@ import NavigationGuard from './components/layout/NavigationGuard';
 import './index.css';
 import QuizComponent from './components/Quiz/QuizComponent';
 import ResultsPage from './pages/ResultPage';
-import AnalyticsPage from "./components/Analytics/AnalyticsPage.jsx";
-import LeaderboardPage from "./components/Analytics/LeaderboardPage";
+import AnalyticsPage from './components/Analytics/AnalyticsPage';
+import LeaderboardPage from './components/Analytics/LeaderboardPage';
+import ChallengeAnalytics from './components/Analytics/ChallengeAnalytics';
+import ForgotPassword from "./components/SignUp/ForgotPassword";
 
 const router = createBrowserRouter([
   {
@@ -34,24 +37,31 @@ const router = createBrowserRouter([
       { path: 'settings', element: <Settings /> },
       { path: 'profile', element: <Profile /> },
       { path: 'analytics', element: <AnalyticsPage /> },
+      { path: 'analytics/report/:id', element: <ChallengeAnalytics /> },
       { path: 'leaderboard/:id', element: <LeaderboardPage /> },
-      { path: 'quiz/:id', element:<QuizComponent/>},
-      {path:'results/:id',element:<ResultsPage/>}
+      { path: 'quiz/:id', element: <QuizComponent /> },
+      { path: 'results/:id', element: <ResultsPage /> }
     ],
   },
   {
     path: '/logout',
     element: <AuthForm />,
   },
-
-  { path: '*', element: <NotFound /> }
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />
+  },
+  {
+    path: '*',
+    element: <NotFound />
+  }
 
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  <AuthProvider>
     <ThemeProvider>
       <RouterProvider router={router} />
     </ThemeProvider>
-  </React.StrictMode>
+  </AuthProvider>
 );

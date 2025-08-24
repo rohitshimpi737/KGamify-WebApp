@@ -3,14 +3,11 @@ import { useState } from 'react';
 import Layout from './components/layout/Layout';
 import { Outlet } from 'react-router-dom';
 
-// In App.jsx, ensure state is properly passed:
-// src/App.jsx
+
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [selectedSort, setSelectedSort] = useState('DATE');
-
-  
 
   return (
     <Layout 
@@ -25,9 +22,10 @@ function App() {
         searchQuery, 
         selectedFilter,
         selectedSort,
-        setSelectedSort  // MUST include this
-      }}  />
+        setSelectedSort
+      }} />
     </Layout>
   );
 }
+
 export default App;

@@ -1,4 +1,0 @@
-# kGamify Website 
-# React - tailwindcss
-
-
