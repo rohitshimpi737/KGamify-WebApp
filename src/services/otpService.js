@@ -11,12 +11,12 @@ export const sendOTP = async (phoneNumber) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        apikey: "DpVG4QrDYOsA5Otr",
-        senderid: "YANTRI",
+       apikey: import.meta.env.VITE_MTALKZ_API_KEY,
+        senderid: import.meta.env.VITE_MTALKZ_SENDER_ID,
         number: phoneNumber,
         message: `Your OTP- One Time Password is ${currentOTP} to authenticate your login on kGamify app. This OTP is valid for 3 mins. -Team kGamify`,
         format: "json",
-        template_id: "1107174350946322136"
+        template_id: import.meta.env.VITE_MTALKZ_TEMPLATE_ID
       })
     });
 
