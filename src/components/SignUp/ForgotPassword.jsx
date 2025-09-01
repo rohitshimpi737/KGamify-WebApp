@@ -89,8 +89,8 @@ export default function ForgotPassword() {
       {/* Logo - Top Center */}
       <div className="flex justify-center pt-6 mb-8">
         <img
-          src="/src/assets/KGamify.svg"
-          alt="KGamify Logo"
+          src="/src/assets/KLOGO.png"
+          alt="kGamify Logo"
           className="h-10 w-auto"
         />
       </div>

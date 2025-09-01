@@ -3,6 +3,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import ChallengeCard from '../components/cards/ChallengeCard';
 import API from '../services/api';
 import { useAsyncState } from '../hooks/useAsyncState';
+import KgamifyAdCarousel from '../components/ui/Advertisement';
 
 function Dashboard() {
 
@@ -307,6 +308,9 @@ function Dashboard() {
           )}
         </div>
       </div>
+
+
+      <KgamifyAdCarousel className="pb-8"></KgamifyAdCarousel>
 
       {/* Filter Controls */}
       <div className="flex justify-between items-center mb-4">

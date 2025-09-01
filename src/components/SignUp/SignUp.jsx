@@ -121,9 +121,9 @@ export default function AuthForm() {
       <div className="flex justify-center mb-8">
         <div className="rounded-3xl overflow-hidden p-2 bg-gray-50">
           <img
-            src="/src/assets/KGamify.svg"
-            alt="KGamify Logo"
-            className="w-20 h-20"
+            src="/src/assets/KLOGO.png"
+            alt="kGamify Logo"
+            className="w-20 h-20 rounded-md"
           />
         </div>
       </div>
@@ -282,7 +282,7 @@ export default function AuthForm() {
               />
               <label className="ml-2 text-sm text-gray-600">
                 By continuing, you agree to our{" "}
-                <a href="/" className="text-[#FFAB40] hover:underline">
+                <a href="https://kgamify.in/championshipmaker/apis/terms_and_conditions_user.php" target="_blank" className="text-[#FFAB40] hover:underline">
                   Terms & Conditions & Privacy Policy
                 </a>
               </label>

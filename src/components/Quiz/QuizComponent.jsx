@@ -5,6 +5,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 import API from "../../services/api";
 import { extractUserId, parseUserPlayResponse } from "../../utils/challengeUtils";
+import KgamifyAdCarousel from '../ui/Advertisement';
 
 export default function QuizComponent() {
 
@@ -589,9 +590,6 @@ export default function QuizComponent() {
               }`}>
               {challenge?.title || `Quiz ${id}`}
             </h2>
-            <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded">
-              Ad
-            </span>
           </div>
           <button
             onClick={handleExitClick}
@@ -603,6 +601,11 @@ export default function QuizComponent() {
             </svg>
           </button>
         </div>
+
+        <KgamifyAdCarousel
+        endpoint={`https://kgamify.in/championshipmaker/apis/fetch_champ_advertisements.php?champ_id=${challenge.id}`}
+        radius={0}
+        />
 
         {/* ========== STATUS BAR ========== */}
         <div className={`flex justify-between text-sm mb-2 ${darkMode ? "text-gray-300" : "text-gray-600"

@@ -58,9 +58,9 @@ const Settings = () => {
         </div>
 
         {/* License Section - simplified */}
-          <div className="relative">
+          {/* <div className="relative">
             <h2 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>Licenses</h2>
-          </div>
+          </div> */}
         </div>
     </div>
   );
