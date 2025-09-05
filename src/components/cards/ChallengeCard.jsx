@@ -5,6 +5,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import TeacherDetail from "./TeacherDetail";
 import RulesCard from "./RulesCard";
 import { validateChallengeData, getStatusStyle, getParticipantCount } from "../../utils/challengeUtils";
+import KgamifyAdCarousel from '../ui/Advertisement';
 
 const ChallengeCard = ({ challenge }) => {
 
@@ -116,6 +117,12 @@ const ChallengeCard = ({ challenge }) => {
       className={`mx-auto max-w-md rounded-xl border-1 border-orange-400 shadow-lg overflow-hidden p-4 sm:p-6 relative ${darkMode ? "bg-black text-white" : "bg-white text-gray-800"
         }`}
     >
+      {/* https://kgamify.in/championshipmaker/apis/fetch_champ_advertisements.php?champ_id={{champId}} */}
+      <KgamifyAdCarousel 
+      endpoint= {`https://kgamify.in/championshipmaker/apis/fetch_champ_advertisements.php?champ_id=${challengeData.id}`}
+      className="pb-8"
+      radius={4}
+      ></KgamifyAdCarousel>
       {/* Header Section: Mode  and ID */}
       <div className="flex justify-between items-start mb-3">
         <span className="text-red-400 font-medium text-base">
