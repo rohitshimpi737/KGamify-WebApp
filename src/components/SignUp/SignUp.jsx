@@ -388,7 +388,6 @@ export default function AuthForm() {
         />
       )}
 
-   // In SignUp.jsx
       {showOTPVerification && formData && (
         <OTPVerification
           phoneNumber={formData.phone}

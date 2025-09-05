@@ -1,6 +1,7 @@
 // src/contexts/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import API from '../services/api';
+import DefaultImage from "../assets/image.png";
 
 const AuthContext = createContext({
   user: null,
@@ -17,6 +18,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [profileImage, setProfileImage] = useState(DefaultImage);
+
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -121,6 +124,8 @@ const login = async (credentials) => {
     logout,
     signUp,
     clearError,
+    profileImage,
+    setProfileImage
   };
 
   return (

@@ -1,11 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import removeConsole from "vite-plugin-remove-console";
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss() , removeConsole()],
   server: {
-    allowedHosts: ['ca253614a22c.ngrok-free.app'],
+    allowedHosts: ['33dcee90d62f.ngrok-free.app'],
       proxy: {
       '/mtalkz-api': {
         target: 'https://msgn.mtalkz.com',

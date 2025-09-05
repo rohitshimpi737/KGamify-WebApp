@@ -77,6 +77,7 @@ const handleResend = async () => {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
+
 //   return (
 //     <div className="fixed inset-0 bg-white z-50">
 //       <div className="max-w-md mx-auto px-4 pt-4">

@@ -59,7 +59,7 @@ const RulesCard = ({ onClose, challenge }) => {
 
     if (userPlayStatus) {
       const currentUserId = getUserId();
-      navigate(`/app/analytics/${challengeId}`, {
+      navigate(`/app/analytics/report/${challengeId}`, {
         state: {
           message: isCompleted
             ? "Championship has ended. View your results below."

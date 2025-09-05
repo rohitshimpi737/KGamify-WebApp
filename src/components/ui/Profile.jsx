@@ -5,12 +5,14 @@ import DefaultImage from "../../assets/image.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useProfile } from "../../hooks/useProfile";
 import { useLocation } from "../../hooks/useLocation";
+import ProfileImage from '../layout/ProfileImage';
+
 
 const Profile = () => {
   const { darkMode } = useTheme();
   const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
-  
+
   // Custom hooks for profile and location management
   const {
     profileData,
@@ -22,7 +24,7 @@ const Profile = () => {
     saveProfile,
     resetProfile
   } = useProfile();
-  
+
   const { countries, states, cities, getDisplayNames } = useLocation(profileData);
   const { country: countryName, state: stateName } = getDisplayNames();
 
@@ -32,7 +34,7 @@ const Profile = () => {
 
   const interestsList = [
     "Video Games",
-    "Travelling", 
+    "Travelling",
     "Music",
     "Puzzles",
     "Movies",
@@ -88,88 +90,69 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-2 space-y-8">
+    <div className="max-w-5xl mx-auto p-2 space-y-8">
       {/* Header with Back and Edit Buttons */}
       <div className="flex justify-between items-center">
-        <button 
+        <button
           onClick={handleBackClick}
-          className={`p-2 hover:bg-zinc-300 rounded-full ${
-            darkMode ? " text-white" : "bg-zinc-500"
-          }`}
+          className={`p-2 hover:bg-zinc-300 rounded-full ${darkMode ? " text-white" : "bg-zinc-500"
+            }`}
         >
-          <svg 
-            className="w-6 h-6" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M15 19l-7-7 7-7" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
             />
-          </svg> 
-          
+          </svg>
+
         </button>
-        
+
         {!isEditing && (
-          <button 
+          <button
             onClick={() => setIsEditing(true)}
-            className={`p-2 rounded-full ${
-              darkMode ? "bg-zinc-800 text-white" : "bg-zinc-500"
-            }`}
+            className={`p-2 rounded-full ${darkMode ? "bg-zinc-800 text-white" : "bg-zinc-500"
+              }`}
           >
-            <svg 
-              className="w-6 h-6" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
               />
             </svg>
           </button>
         )}
       </div>
-        
+
       {/* Profile Header - Modified Layout */}
-      <div className="flex items-center gap-6">
-        <div className="relative w-32 h-32">
-          {isEditing ? (
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-          ) : null}
-          <div className="w-full h-full rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden dark:bg-zinc-800">
-            {selectedImage && (
-              <img
-                src={selectedImage}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            )}
-          </div>
-        </div>
+      <div className="flex items-center gap-4">
+        <ProfileImage
+          size="md"
+          editable={isEditing}
+          darkMode={darkMode}
+          imageSrc={selectedImage}
+          onImageChange={setSelectedImage}
+        />
         <div className="flex flex-col">
-          <h2 className={`text-2xl font-bold text-black ${darkMode ? 'text-white': ''}`}>
+          <h2 className={`text-2xl font-bold text-black ${darkMode ? 'text-white' : ''}`}>
             {profileData.name || "User"}
           </h2>
           <p className="text-gray-500 dark:text-gray-300">
-            {user?.user_id ? `ID: ${user.user_id}` : `Email: ${user?.email || "Unknown"}`}
+            {user?.user_key ? `ID: ${user.user_key}` : `Email: ${user?.email || "Unknown"}`}
           </p>
-          {user?.recent_login && (
-            <p className="text-gray-400 dark:text-gray-400 text-sm">
-              Last login: {new Date(user.recent_login).toLocaleDateString()}
-            </p>
-          )}
           {user?.first_login && (
             <p className="text-gray-400 dark:text-gray-400 text-sm">
               Member since: {new Date(user.first_login).toLocaleDateString()}
@@ -177,12 +160,13 @@ const Profile = () => {
           )}
         </div>
       </div>
+
       {/* Details Section */}
-      <div className="space-y-6">
+      {/* <div className="space-y-6">
+
         <div
-          className={`p-5 grid grid-cols-1 md:grid-cols-2 gap-6 rounded-3xl ${
-            darkMode ? "bg-zinc-900" : "bg-zinc-100"
-          }`}
+          className={`p-5 grid grid-cols-1 md:grid-cols-2 gap-6 rounded-3xl ${darkMode ? "bg-zinc-900" : "bg-zinc-100"
+            }`}
         >
           <h1 className={`text-2xl ${darkMode ? "text-zinc-200" : "text-zinc-700"}`}>
             Details
@@ -197,9 +181,8 @@ const Profile = () => {
                 type="text"
                 value={profileData.name}
                 onChange={(e) => updateField('name', e.target.value)}
-                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
-                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
-                }`}
+                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
+                  }`}
               />
             ) : (
               <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
@@ -217,9 +200,8 @@ const Profile = () => {
                 type="number"
                 value={profileData.age}
                 onChange={(e) => updateField('age', e.target.value)}
-                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
-                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
-                }`}
+                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
+                  }`}
               />
             ) : (
               <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
@@ -237,9 +219,8 @@ const Profile = () => {
                 type="email"
                 value={profileData.email}
                 onChange={(e) => updateField('email', e.target.value)}
-                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
-                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
-                }`}
+                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
+                  }`}
               />
             ) : (
               <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
@@ -257,9 +238,8 @@ const Profile = () => {
                 type="tel"
                 value={profileData.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
-                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
-                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
-                }`}
+                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
+                  }`}
               />
             ) : (
               <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
@@ -277,9 +257,8 @@ const Profile = () => {
                 type="text"
                 value={profileData.qualification}
                 onChange={(e) => updateField('qualification', e.target.value)}
-                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${
-                  darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
-                }`}
+                className={`w-full p-2 border border-zinc-500 rounded-md outline-none ${darkMode ? "bg-zinc-800 text-white border-zinc-600" : "text-black"
+                  }`}
               />
             ) : (
               <div className={`p-2 ${darkMode ? "text-white" : "text-black"}`}>
@@ -289,7 +268,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Address Section */}
         <div className={`rounded-3xl p-5 ${darkMode ? "bg-zinc-900" : "bg-zinc-100"}`}>
           <h1 className={`text-2xl ${darkMode ? "text-zinc-200" : "text-zinc-700"}`}>
             Address
@@ -370,7 +348,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Interests Section */}
         <div className={`rounded-3xl p-5 ${darkMode ? "bg-zinc-900" : "bg-zinc-100"}`}>
           <label className={`block mb-4 text-2xl ${darkMode ? "text-zinc-200" : "text-zinc-700"}`}>
             Interests
@@ -382,11 +359,10 @@ const Profile = () => {
                   key={interest}
                   type="button"
                   onClick={() => toggleInterest(interest)}
-                  className={`px-4 py-2 cursor-pointer rounded-full text-sm border-orange-500 ${
-                    profileData.interests.includes(interest)
+                  className={`px-4 py-2 cursor-pointer rounded-full text-sm border-orange-500 ${profileData.interests.includes(interest)
                       ? "bg-[#f58220] text-white"
                       : `bg-[#fcf8ff] border ${darkMode ? 'bg-zinc-800 text-white border-orange-200' : 'text-black'}`
-                  }`}
+                    }`}
                 >
                   {interest}
                 </button>
@@ -401,26 +377,7 @@ const Profile = () => {
             ))}
           </div>
         </div>
-
-        {/* Manage Account */}
-        <div className={`rounded-3xl p-5 ${darkMode ? "bg-zinc-900" : "bg-zinc-100"}`}>
-          <h1 className={`block mb-3 text-2xl ${darkMode ? "text-zinc-200" : "text-zinc-700"}`}>
-            Manage Account
-          </h1>
-          <div className="flex flex-col gap-1.5">
-            <button 
-              onClick={handleLogout}
-              className="text-red-500 dark:text-red-400 text-left hover:text-red-600 transition-colors"
-            >
-              Logout
-            </button>
-            <Link to="/logout" className="text-red-500 dark:text-red-400 hover:text-red-600 transition-colors">
-              Delete Account
-            </Link>
-          </div>
-        </div>
-
-        {/* Save Button - Only visible in edit mode */}
+        
         {isEditing && (
           <div className="pt-6">
             {error && (
@@ -429,18 +386,17 @@ const Profile = () => {
               </div>
             )}
             <div className="flex gap-3">
-              <button 
-                className={`px-6 py-2 rounded-md transition ${
-                  isSaving 
-                    ? 'bg-gray-400 cursor-not-allowed' 
+              <button
+                className={`px-6 py-2 rounded-md transition ${isSaving
+                    ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-[#f58220] hover:bg-[#e67300] cursor-pointer'
-                } text-white`}
+                  } text-white`}
                 onClick={handleSaveChanges}
                 disabled={isSaving}
               >
                 {isSaving ? 'Saving...' : 'Save Changes'}
               </button>
-              <button 
+              <button
                 className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition"
                 onClick={() => {
                   resetProfile();
@@ -453,7 +409,177 @@ const Profile = () => {
             </div>
           </div>
         )}
+      </div> */}
+
+      <div className={`p-4 rounded-3xl ${darkMode ? "bg-zinc-900" : "bg-gray-100"}`}>
+        <h2 className={`text-xl mb-4 ${darkMode ? "text-white" : "text-gray-800"}`}>Details</h2>
+        <div className="space-y-4">
+          {/* Name */}
+          <div className="relative">
+            <label className={`absolute -top-2 left-4 px-2 text-sm ${darkMode ? "bg-zinc-900 text-zinc-400" : "bg-gray-100 text-gray-500"
+              }`}>
+              Name
+            </label>
+            <input
+              type="text"
+              value={profileData.name}
+              onChange={(e) => updateField('name', e.target.value)}
+              disabled={!isEditing}
+              className={`w-full p-3 border rounded-xl outline-none ${darkMode
+                  ? "bg-zinc-900 border-zinc-700 text-white"
+                  : "bg-gray-100 border-gray-200 text-gray-800"
+                } ${!isEditing ? 'cursor-default' : ''}`}
+            />
+          </div>
+
+          {/* Age */}
+          <div className="relative">
+            <label className={`absolute -top-2 left-4 px-2 text-sm ${darkMode ? "bg-zinc-900 text-zinc-400" : "bg-gray-100 text-gray-500"
+              }`}>
+              Age
+            </label>
+            <input
+              type="number"
+              value={profileData.age}
+              onChange={(e) => updateField('age', e.target.value)}
+              disabled={!isEditing}
+              className={`w-full p-3 border rounded-xl outline-none ${darkMode
+                  ? "bg-zinc-900 border-zinc-700 text-white"
+                  : "bg-gray-100 border-gray-200 text-gray-800"
+                } ${!isEditing ? 'cursor-default' : ''}`}
+            />
+          </div>
+
+          {/* Email */}
+          <div className="relative">
+            <label className={`absolute -top-2 left-4 px-2 text-sm ${darkMode ? "bg-zinc-900 text-zinc-400" : "bg-gray-100 text-gray-500"
+              }`}>
+              Email
+            </label>
+            <input
+              type="email"
+              value={profileData.email}
+              disabled
+              className={`w-full p-3 border rounded-xl outline-none cursor-not-allowed ${darkMode
+                  ? "bg-zinc-900 border-zinc-700 text-white"
+                  : "bg-gray-100 border-gray-200 text-gray-800"
+                }`}
+            />
+          </div>
+
+          {/* Phone */}
+          <div className="relative">
+            <label className={`absolute -top-2 left-4 px-2 text-sm ${darkMode ? "bg-zinc-900 text-zinc-400" : "bg-gray-100 text-gray-500"
+              }`}>
+              Phone number
+            </label>
+            <input
+              type="tel"
+              value={profileData.phone}
+              disabled
+              className={`w-full p-3 border rounded-xl outline-none cursor-not-allowed ${darkMode
+                  ? "bg-zinc-900 border-zinc-700 text-white"
+                  : "bg-gray-100 border-gray-200 text-gray-800"
+                }`}
+            />
+          </div>
+
+          {/* Address */}
+          <div className="relative">
+            <label className={`absolute -top-2 left-4 px-2 text-sm ${darkMode ? "bg-zinc-900 text-zinc-400" : "bg-gray-100 text-gray-500"
+              }`}>
+              Address
+            </label>
+            {isEditing ? (
+              <div className="flex gap-2">
+                <select
+                  value={profileData.country}
+                  onChange={(e) => updateLocation('country', e.target.value)}
+                  className={`w-1/3 p-3 border rounded-xl ${darkMode ? "bg-zinc-900 border-zinc-700 text-white" : "bg-gray-100 border-gray-200"
+                    }`}
+                >
+                  <option value="">Country</option>
+                  {countries.map(c => <option key={c.isoCode} value={c.isoCode}>{c.name}</option>)}
+                </select>
+                <select
+                  value={profileData.state}
+                  onChange={(e) => updateLocation('state', e.target.value)}
+                  className={`w-1/3 p-3 border rounded-xl ${darkMode ? "bg-zinc-900 border-zinc-700 text-white" : "bg-gray-100 border-gray-200"
+                    }`}
+                  disabled={!profileData.country}
+                >
+                  <option value="">State</option>
+                  {states.map(s => <option key={s.isoCode} value={s.isoCode}>{s.name}</option>)}
+                </select>
+                <select
+                  value={profileData.city}
+                  onChange={(e) => updateLocation('city', e.target.value)}
+                  className={`w-1/3 p-3 border rounded-xl ${darkMode ? "bg-zinc-900 border-zinc-700 text-white" : "bg-gray-100 border-gray-200"
+                    }`}
+                  disabled={!profileData.state}
+                >
+                  <option value="">City</option>
+                  {cities.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                </select>
+              </div>
+            ) : (
+              <input
+                type="text"
+                value={[profileData.city, stateName, countryName].filter(Boolean).join(", ")}
+                disabled
+                className={`w-full p-3 border rounded-xl outline-none ${darkMode
+                    ? "bg-zinc-900 border-zinc-700 text-white"
+                    : "bg-gray-100 border-gray-200 text-gray-800"
+                  } cursor-default`}
+              />
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Interests Section */}
+      <div className={`p-6 rounded-3xl ${darkMode ? "bg-zinc-900" : "bg-gray-50"}`}>
+        <h2 className={`text-xl mb-4 ${darkMode ? "text-white" : "text-gray-800"}`}>Interests</h2>
+        <div className="flex flex-wrap gap-3">
+          {interestsList.map((interest) => (
+            <button
+              key={interest}
+              onClick={() => isEditing && toggleInterest(interest)}
+              className={`px-4 py-2 rounded-full text-sm border transition-colors ${profileData.interests.includes(interest)
+                ? "bg-[#f58220] border-[#f58220] text-white"
+                : darkMode
+                  ? "bg-zinc-800 border-zinc-700 text-zinc-400"
+                  : "bg-white border-gray-200 text-gray-500"
+                } ${isEditing ? 'cursor-pointer hover:bg-orange-50' : 'cursor-default'}`}
+            >
+              {interest}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Save/Cancel Buttons */}
+      {isEditing && (
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={() => {
+              resetProfile();
+              setIsEditing(false);
+            }}
+            className="px-6 py-2 rounded-full border border-zinc-300 hover:bg-zinc-100 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSaveChanges}
+            disabled={isSaving}
+            className="px-6 py-2 rounded-full bg-[#f58220] text-white hover:bg-[#e67300] transition-colors disabled:opacity-50"
+          >
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      )}
+
     </div>
   );
 };
