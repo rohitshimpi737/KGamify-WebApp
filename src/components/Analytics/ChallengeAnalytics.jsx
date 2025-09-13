@@ -156,6 +156,8 @@ const ChallengeAnalytics = () => {
   // ===========================
   // RENDER
   // ===========================
+
+
   return (
     <div
       className={`p-4 min-h-screen ${
@@ -195,90 +197,104 @@ const ChallengeAnalytics = () => {
         <h3 className="text-xl font-bold mb-4">Report Card</h3>
 
         {computedData ? (
-          <div
-            className={`rounded-lg overflow-hidden shadow-lg ${
-              darkMode ? "bg-gray-900" : "bg-white"
-            }`}
-          >
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-orange-500 text-white">
-                  <th className="p-3 text-center">Q.No</th>
-                  <th className="p-3 text-center">Base Points</th>
-                  <th className="p-3 text-center">Bonus / Penalty</th>
-                  <th className="p-3 text-center">Total Points</th>
-                  <th className="p-3 text-center">Time Taken</th>
-                  <th className="p-3 text-center">Expected Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {computedData.rows.map((row) => (
-                  <tr
-                    key={row.qNo}
-                    className={`border-b ${
-                      darkMode ? "border-gray-700" : "border-gray-200"
-                    } hover:bg-gray-50 dark:hover:bg-gray-800`}
-                  >
-                    <td className="p-3 text-center">Q {row.qNo}</td>
-                    <td className="p-3 text-center font-semibold">
-                      {row.baseCoins}
-                    </td>
-                    <td
-                      className={`p-3 text-center font-semibold ${getScoreColor(
-                        row.bonusPenalty
-                      )}`}
-                    >
-                      {row.bonusPenalty.toFixed(2)}
-                    </td>
-                    <td
-                      className={`p-3 text-center font-semibold ${getScoreColor(
-                        row.totalPoints
-                      )}`}
-                    >
-                      {row.totalPoints.toFixed(2)}
-                    </td>
-                    <td className="p-3 text-center">{row.actualTime}</td>
-                    <td className="p-3 text-center">{row.expectedTime}</td>
+          <div className="rounded-lg overflow-hidden shadow-lg">
+            {/* Make table horizontally scrollable */}
+            <div className="w-full overflow-x-auto">
+              <table className={`min-w-[450px] w-full text-sm ${darkMode ? "bg-gray-900" : "bg-white"}`}>
+                <thead>
+                  <tr className="bg-orange-500 text-white">
+                    <th className="text-center w-12 py-2">Q. No</th>
+                    <th className="text-center w-10 py-2">
+                      <div>Base</div>
+                      <div>Points</div>
+                    </th>
+                    <th className="text-center w-20 py-2">
+                      <div>Bonus /</div>
+                      <div>Penalty</div>
+                    </th>
+                    <th className="text-center w-20 py-2">
+                      <div>Total</div>
+                      <div>Points</div>
+                    </th>
+                    <th className="text-center w-22 py-2">
+                      <div>Time</div>
+                      <div>Taken</div>
+                    </th>
+                    <th className="text-center w-22 py-2">
+                      <div>Expected</div>
+                      <div>Time</div>
+                    </th>
                   </tr>
-                ))}
+                </thead>
+                <tbody>
+                  {computedData.rows.map((row) => (
+                    <tr
+                      key={row.qNo}
+                      className={`border-b ${
+                        darkMode ? "border-gray-700" : "border-gray-200"
+                      } hover:bg-gray-50 dark:hover:bg-gray-800`}
+                    >
+                      <td className="text-center py-2">Q {row.qNo}</td>
+                      <td className="text-center font-semibold py-2">
+                        {row.baseCoins}
+                      </td>
+                      <td
+                        className={`text-center font-semibold py-2 ${getScoreColor(
+                          row.bonusPenalty
+                        )}`}
+                      >
+                        {row.bonusPenalty.toFixed(2)}
+                      </td>
+                      <td
+                        className={`text-center font-semibold py-2 ${getScoreColor(
+                          row.totalPoints
+                        )}`}
+                      >
+                        {row.totalPoints.toFixed(2)}
+                      </td>
+                      <td className="text-center py-2">{row.actualTime}</td>
+                      <td className="text-center py-2">{row.expectedTime}</td>
+                    </tr>
+                  ))}
 
-                {/* Totals Row */}
-                <tr
-                  className={`border-t-2 ${
-                    darkMode
-                      ? "border-gray-600 bg-gray-800"
-                      : "border-gray-300 bg-gray-100"
-                  } font-bold`}
-                >
-                  <td className="p-3 text-center">Totals</td>
-                  <td className="p-3 text-center">
-                    {computedData.totals.baseCoins.toFixed(2)}
-                  </td>
-                  <td
-                    className={`p-3 text-center ${
-                      computedData.totals.bonusPenalty < 0
-                        ? "text-red-500"
-                        : "text-green-600"
-                    }`}
+                  {/* Totals Row */}
+                  <tr
+                    className={`border-t-2 ${
+                      darkMode
+                        ? "border-gray-600 bg-gray-800"
+                        : "border-gray-300 bg-gray-100"
+                    } font-bold`}
                   >
-                    {computedData.totals.bonusPenalty.toFixed(2)}
-                  </td>
-                  <td className="p-3 text-center text-green-600">
-                    {computedData.totals.totalPoints.toFixed(2)}
-                  </td>
-                  <td className="p-3 text-center">
-                    {new Date(computedData.totals.totalActualTime * 1000)
-                      .toISOString()
-                      .substr(11, 8)}
-                  </td>
-                  <td className="p-3 text-center">
-                    {new Date(computedData.totals.totalExpectedTime * 1000)
-                      .toISOString()
-                      .substr(11, 8)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <td className="text-center py-2">Σ</td>
+                    <td className="text-center py-2">
+                      {computedData.totals.baseCoins.toFixed(2)}
+                    </td>
+                    <td
+                      className={`text-center py-2 ${
+                        computedData.totals.bonusPenalty < 0
+                          ? "text-red-500"
+                          : "text-green-600"
+                      }`}
+                    >
+                      {computedData.totals.bonusPenalty.toFixed(2)}
+                    </td>
+                    <td className="text-center py-2 text-green-600">
+                      {computedData.totals.totalPoints.toFixed(2)}
+                    </td>
+                    <td className="text-center py-2">
+                      {new Date(computedData.totals.totalActualTime * 1000)
+                        .toISOString()
+                        .substr(11, 8)}
+                    </td>
+                    <td className="text-center py-2">
+                      {new Date(computedData.totals.totalExpectedTime * 1000)
+                        .toISOString()
+                        .substr(11, 8)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : (
           <div

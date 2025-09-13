@@ -11,7 +11,7 @@ export default defineConfig({
     removeConsole()
   ],
   
-  base: './', 
+  base: '/', 
   
   resolve: {
     alias: {
