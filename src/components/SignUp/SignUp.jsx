@@ -121,7 +121,7 @@ export default function AuthForm() {
       <div className="flex justify-center mb-8">
         <div className="rounded-3xl overflow-hidden p-2 bg-gray-50">
           <img
-            src="/src/assets/KLOGO.png"
+            src="/images/KLOGO.png"
             alt="kGamify Logo"
             className="w-20 h-20 rounded-md"
           />
@@ -436,8 +436,8 @@ export default function AuthForm() {
               }
             } catch (error) {
               console.error("Signup error:", error);
-              clearError(); 
-              setValidationErrors({}); 
+              clearError();
+              setValidationErrors({});
               setError('Network error occurred. Please try again.');
               // Reset states on error
               setVerifiedPhone(false);

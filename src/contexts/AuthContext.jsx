@@ -1,7 +1,7 @@
 // src/contexts/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 import API from '../services/api';
-import DefaultImage from "../assets/image.png";
+const DefaultImage = '/images/image.png';
 
 const AuthContext = createContext({
   user: null,

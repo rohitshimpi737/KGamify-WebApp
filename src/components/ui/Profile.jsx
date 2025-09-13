@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
-import DefaultImage from "../../assets/image.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useProfile } from "../../hooks/useProfile";
 import { useLocation } from "../../hooks/useLocation";
@@ -12,6 +11,8 @@ const Profile = () => {
   const { darkMode } = useTheme();
   const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
+  const DefaultImage = "/images/image.png";
+
 
   // Custom hooks for profile and location management
   const {

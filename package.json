@@ -10,9 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.8",
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.1.7",
     "autoprefixer": "^10.4.21",
+    "axios": "^1.12.1",
     "country-state-city": "^3.2.1",
     "lucide-react": "^0.518.0",
     "md5": "^2.3.0",

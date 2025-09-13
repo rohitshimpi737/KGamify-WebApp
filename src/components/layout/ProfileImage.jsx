@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import DefaultImage from "../../assets/image.png";
+const DefaultImage = '/images/image.png';
 
 const ProfileImage = ({ 
   size = 'md', 
