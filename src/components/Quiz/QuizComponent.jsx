@@ -26,6 +26,7 @@ export default function QuizComponent() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Current Question State
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -155,12 +156,15 @@ export default function QuizComponent() {
   // ========================================
 
   useEffect(() => {
-    if (loading || timeRemaining <= 0) return;
+    if (loading || timeRemaining <= 0 || isSubmitting) return;
 
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
-          handleSubmitQuiz();
+          if (!isSubmitting) {
+            setIsSubmitting(true);
+            handleSubmitQuiz();
+          }
           return 0;
         }
         return prev - 1;
@@ -168,7 +172,7 @@ export default function QuizComponent() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [loading, timeRemaining]);
+  }, [loading, timeRemaining, isSubmitting]);
 
   // ========================================
   // SCORING ENGINE
@@ -342,6 +346,9 @@ export default function QuizComponent() {
 
 
   const handleSubmitQuiz = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     // Better user ID extraction using centralized utility
     const userId = extractUserId(user);
     const userObject = user?.userData || user;
@@ -349,9 +356,11 @@ export default function QuizComponent() {
     // Record final question time
     if (questionStartTime) {
       const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
-      const updatedTimes = [...questionTimes];
-      updatedTimes[currentQuestionIndex] = timeSpent;
-      setQuestionTimes(updatedTimes);
+      setQuestionTimes(prev => {
+        const updated = [...prev];
+        updated[currentQuestionIndex] = timeSpent;
+        return updated;
+      });
     }
 
     let results = {
@@ -401,7 +410,7 @@ export default function QuizComponent() {
         results.totalBonus += questionResult.bonus;
         results.totalPenalty += questionResult.penalty;
 
-        // Submit individual question result to API with proper points_earned
+        // Prepare question result for batch submission
         const champId = challenge?.id || challenge?.championshipData?.champ_id;
 
         // Allow negative points to be submitted for wrong answers
@@ -415,17 +424,16 @@ export default function QuizComponent() {
           // Allow negative points for ALL questions - both correct and wrong can be negative
           let pointsEarned = Math.round(questionResult.score * 100) / 100; // Can be negative for both correct/wrong
 
-          await API.quiz.submitResult({
+          results.questionSubmissions = results.questionSubmissions || [];
+          results.questionSubmissions.push({
             questionId: question.question_id,
             champId: champId,
             userId: userId,
             timeTaken: timeTaken,
             expectedTime: questionResult.expectedTime,
-            pointsEarned: pointsEarned, // Allow negative values
+            pointsEarned: pointsEarned,
             correctAns: question.correct_answer,
             submittedAns: answerForAPI
-          }).catch((error) => {
-            console.error('Individual result submission failed for question', idx + 1, ':', error);
           });
         }
       }
@@ -442,32 +450,44 @@ export default function QuizComponent() {
       const modeId = challenge?.championshipData?.mode_id || challenge?.modeId;
 
       if (userId && champId && challenge?.championshipData) {
-        const expectedTotalTime = questions.reduce((total, question) => {
-          const expectedTimeStr = question.expected_time || "00:03:00";
-          const [hours, minutes, seconds] = expectedTimeStr.split(':').map(Number);
-          return total + (hours * 3600) + (minutes * 60) + (seconds || 0);
-        }, 0);
+        try {
+          // First, submit all individual question results in one batch if there are any
+          if (results.questionSubmissions?.length > 0) {
+            await Promise.all(
+              results.questionSubmissions.map(submission =>
+                API.quiz.submitResult(submission)
+              )
+            );
+          }
 
-        // Calculate final score properly - allow negative scores for display
-        const finalTotalScore = Math.round(results.totalScore);
+          const expectedTotalTime = questions.reduce((total, question) => {
+            const expectedTimeStr = question.expected_time || "00:03:00";
+            const [hours, minutes, seconds] = expectedTimeStr.split(':').map(Number);
+            return total + (hours * 3600) + (minutes * 60) + (seconds || 0);
+          }, 0);
 
-        const finalPayload = {
-          champId: champId,
-          userId: userId,
-          timeTaken: results.totalTimeSpent,
-          expectedTime: expectedTotalTime,
-          gameMode: modeId,
-          totalQuestions: questions.length,
-          correctQuestions: results.correctQuestions,
-          totalScore: finalTotalScore, // Use non-negative score
-          totalBonus: Math.round(results.totalBonus),
-          totalPenalty: Math.round(results.totalPenalty),
-          totalNegativePoints: Math.round(results.totalPenalty)
-        };
+          // Calculate final score properly - allow negative scores for display
+          const finalTotalScore = Math.round(results.totalScore);
 
-        await API.quiz.submitFinalResult(finalPayload).catch((error) => {
-          console.error('Final result submission failed:', error);
-        });
+          // Submit final results
+          const finalPayload = {
+            champId: champId,
+            userId: userId,
+            timeTaken: results.totalTimeSpent,
+            expectedTime: expectedTotalTime,
+            gameMode: modeId,
+            totalQuestions: questions.length,
+            correctQuestions: results.correctQuestions,
+            totalScore: finalTotalScore,
+            totalBonus: Math.round(results.totalBonus),
+            totalPenalty: Math.round(results.totalPenalty),
+            totalNegativePoints: Math.round(results.totalPenalty)
+          };
+
+          await API.quiz.submitFinalResult(finalPayload);
+        } catch (error) {
+          console.error('Quiz submission failed:', error);
+        }
       }
 
     } catch (error) {
