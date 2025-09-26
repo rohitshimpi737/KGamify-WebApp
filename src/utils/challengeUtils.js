@@ -151,11 +151,33 @@ export const formatDate = (dateString, options = {}) => {
 // Calculate days ago from date
 export const getDaysAgo = (endDate) => {
   if (!endDate) return "Recently";
-  const end = new Date(endDate);
-  const now = new Date();
-  const diffTime = Math.abs(now - end);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+  
+  try {
+    const targetDate = new Date(endDate);
+    const now = new Date();
+    
+    // Reset time to start of day for accurate calculation
+    targetDate.setHours(0, 0, 0, 0);
+    now.setHours(0, 0, 0, 0);
+    
+    const diffTime = now.getTime() - targetDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 0) return "Recently"; // Future date
+    
+    // If more than 30 days, show in months
+    if (diffDays >= 30) {
+      const diffMonths = Math.floor(diffDays / 30);
+      return diffMonths === 1 ? "1 month ago" : `${diffMonths} months ago`;
+    }
+    
+    return diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+  } catch (error) {
+    console.error('Date parsing error:', error);
+    return "Recently";
+  }
 };
 
 // Determine challenge type from API data
@@ -179,14 +201,15 @@ export const transformAnalyticsData = (apiData) => {
     status: item.status || "Ended",
     start: item.start_date || item.start,
     end: item.end_date || item.end,
+    playedDate: item.created_at || item.played_date || item.submitted_date,
     score: parseFloat(item.total_score || item.score || 0),
     reward: item.reward || item.has_reward || false,
   }));
 
-  // Sort by end date (latest first), then by start date if end date is not available
+  // Sort by played date (latest first), then by end date if played date is not available
   return transformedData.sort((a, b) => {
-    const dateA = new Date(a.end || a.start || 0);
-    const dateB = new Date(b.end || b.start || 0);
+    const dateA = new Date(a.playedDate || a.end || a.start || 0);
+    const dateB = new Date(b.playedDate || b.end || b.start || 0);
     return dateB - dateA; // Latest first (descending order)
   });
 };

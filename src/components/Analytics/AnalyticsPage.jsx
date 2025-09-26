@@ -17,7 +17,7 @@ import ErrorState from "../ui/ErrorState";
 
 const AnalyticsChallengeCard = ({ challenge }) => {
   const { darkMode } = useTheme();
-  const { id, type, title, category, status, start, end, score, reward, description } = challenge;
+  const { id, type, title, category, status, start, end, score, reward, description, playedDate } = challenge;
 
   return (
     <div
@@ -88,7 +88,7 @@ const AnalyticsChallengeCard = ({ challenge }) => {
           <div className="text-right">
             <span className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}>Played</span>
             <p className={`text-sm font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
-              {getDaysAgo(end)}
+              {getDaysAgo(playedDate)}
             </p>
           </div>
         </div>
@@ -227,6 +227,7 @@ const AnalyticsPage = () => {
             </p>
             <Link
               to="/app"
+              
               className="inline-flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
             >
               Browse Challenges

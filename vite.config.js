@@ -50,6 +50,7 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true, // Added for network access
+    allowedHosts: ['f8d925808e37.ngrok-free.app'],
     proxy: {
       '/mtalkz-api': {
         target: 'https://msgn.mtalkz.com',
