@@ -45,7 +45,7 @@ export default function OTPVerification({ phoneNumber, onVerificationComplete, o
 
 const handleVerify = async (enteredOTP) => {
   try {
-    const isValid = verifyOTP(enteredOTP); // Remove phoneNumber parameter
+    const isValid = verifyOTP(phoneNumber, enteredOTP); // Add phoneNumber parameter
     if (isValid) {
       onVerificationComplete(true);
     } else {

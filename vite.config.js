@@ -11,7 +11,7 @@ export default defineConfig({
     removeConsole()
   ],
   
-  base: '/', 
+  base: './', 
   
   resolve: {
     alias: {
@@ -50,7 +50,6 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true, // Added for network access
-    allowedHosts: ['3585ebab57db.ngrok-free.app'],
     proxy: {
       '/mtalkz-api': {
         target: 'https://msgn.mtalkz.com',
